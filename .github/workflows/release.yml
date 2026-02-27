@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version of the release (e.g. 1.0.0)'
+        required: true
+        type: string
+
+run-name: Build+${{ github.run_number }} release/${{ inputs.version }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+
+    name: 🎉 Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK
+      uses: actions/setup-java@v5
+      with:
+        java-version: '25'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+
+    - name: Configure Gradle properties
+      run: |
+        echo "rettichlpRepositoryPublisherUsername=${{ secrets.REPOSILITE_PUBLISHER_USERNAME }}" >> ~/.gradle/gradle.properties
+        echo "rettichlpRepositoryPublisherPassword=${{ secrets.REPOSILITE_PUBLISHER_PASSWORD }}" >> ~/.gradle/gradle.properties
+
+    - name: Publish with Gradle
+      run: ./gradlew test publish --full-stacktrace -PtrcVersion=${{ inputs.version }}
+
+    - name: Create release notes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ inputs.version }}
+      run: |
+        gh release create "$tag" \
+            --target main \
+            --repo="$GITHUB_REPOSITORY" \
+            --title="The Rettington Concierge $tag" \
+            --generate-notes

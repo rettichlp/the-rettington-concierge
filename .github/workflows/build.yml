@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches: [ "develop", "hotfix/**" ]
+  pull_request:
+    branches: [ "develop", "hotfix/**" ]
+
+run-name: Build+${{ github.run_number }} snapshot/${{ github.sha }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK
+      uses: actions/setup-java@v5
+      with:
+        java-version: '25'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+
+    - name: Build with Gradle
+      run: ./gradlew test build --full-stacktrace -PtbVersion=Build

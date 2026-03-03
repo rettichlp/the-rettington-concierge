@@ -34,4 +34,4 @@ jobs:
       uses: gradle/actions/setup-gradle@v5
 
     - name: Build with Gradle
-      run: ./gradlew test build --full-stacktrace -PtbVersion=Build
+      run: ./gradlew build --full-stacktrace -PtrcVersion=Snapshot

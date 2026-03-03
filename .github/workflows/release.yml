@@ -44,7 +44,7 @@ jobs:
         echo "rettichlpRepositoryPublisherPassword=${{ secrets.REPOSILITE_PUBLISHER_PASSWORD }}" >> ~/.gradle/gradle.properties
 
     - name: Publish with Gradle
-      run: ./gradlew test publish --full-stacktrace -PtrcVersion=${{ inputs.version }}
+      run: ./gradlew build publish --full-stacktrace -PtrcVersion=${{ inputs.version }}
 
     - name: Create release notes
       env:

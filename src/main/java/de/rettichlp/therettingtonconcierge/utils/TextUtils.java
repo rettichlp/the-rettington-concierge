@@ -1,12 +1,36 @@
 package de.rettichlp.therettingtonconcierge.utils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import static java.util.Arrays.stream;
+import static net.kyori.adventure.translation.GlobalTranslator.render;
 
 public class TextUtils {
+
+    /**
+     * Converts a translation key and optional arguments into a localized {@link Component} for display, while taking into account the
+     * specified locale.
+     *
+     * @param translationKey The translation key representing the text to be localized. Must not be null.
+     * @param locale         The locale for which the text should be localized. Must not be null.
+     * @param args           Optional arguments to be interpolated into the localized text. Can be empty.
+     *
+     * @return A non-null {@link Component} containing the localized text with any provided arguments.
+     */
+    public static @NonNull Component translationAsComponent(@NonNull String translationKey, @NonNull Locale locale, Object... args) {
+        List<@NotNull TextComponent> argComponents = stream(args).map(Object::toString).map(Component::text).toList();
+        TranslatableComponent translatable = Component.translatable(translationKey, argComponents);
+        return render(translatable, locale);
+    }
 
     /**
      * Splits the given text into a list of lines, where each line is limited to the specified maximum length. Lines are constructed by

@@ -1,12 +1,13 @@
 package de.rettichlp.therettingtonconcierge.registry.listener;
 
 import com.google.inject.Injector;
+import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
 import de.rettichlp.therettingtonconcierge.registry.Ignore;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
@@ -19,8 +20,8 @@ import static org.bukkit.Bukkit.getPluginManager;
 public final class ListenerRegistry extends AbstractRegistry {
 
     @Inject
-    public ListenerRegistry(@NonNull Plugin plugin, @NonNull Injector injector) {
-        super(plugin, injector, "listener");
+    public ListenerRegistry(@NonNull JavaPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
+        super(plugin, injector, logDispatcher, "listener");
     }
 
     @Override

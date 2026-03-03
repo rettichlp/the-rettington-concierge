@@ -41,8 +41,6 @@ public class PermissionUtils {
         };
     }
 
-
-
     @Contract(pure = true)
     public static @NonNull Predicate<CommandSourceStack> has(Function<Player, Boolean> function) {
         return stack -> {

@@ -4,7 +4,8 @@ import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import de.rettichlp.therettingtonconcierge.classloader.ProtectedClassLoaderAccessor;
-import org.bukkit.plugin.Plugin;
+import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
@@ -15,22 +16,23 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.reflect.ClassPath.from;
-import static de.rettichlp.therettingtonconcierge.TheRettingtonConcierge.logDispatcher;
 import static java.util.stream.Collectors.toSet;
 
 public abstract class AbstractRegistry {
 
-    protected final Plugin plugin;
+    protected final JavaPlugin plugin;
     protected final Injector injector;
 
     protected Set<Class<?>> classes;
 
+    private final LogDispatcher logDispatcher;
     private final String registryName;
 
     @Inject
-    public AbstractRegistry(@NonNull Plugin plugin, @NonNull Injector injector, String registryName) {
+    public AbstractRegistry(@NonNull JavaPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher, String registryName) {
         this.plugin = plugin;
         this.injector = injector;
+        this.logDispatcher = logDispatcher;
         this.registryName = registryName;
 
         this.classes = getAllClasses();
@@ -52,16 +54,16 @@ public abstract class AbstractRegistry {
                 register(clazz);
                 registered++;
             } catch (Exception e) {
-                logDispatcher.warn("Failed to register {} {}: {}", this.registryName, clazz.getSimpleName(), e.getMessage());
+                this.logDispatcher.warn("Failed to register {} {}: {}", this.registryName, clazz.getSimpleName(), e.getMessage());
             }
         }
 
-        logDispatcher.info("Registered {}: {}/{}, {} skipped", this.registryName, registered, size(classes), skipped);
+        this.logDispatcher.info("Registered {}: {}/{}, {} skipped", this.registryName, registered, size(classes), skipped);
     }
 
     private Set<Class<?>> getAllClasses() {
         if (!(this.plugin instanceof ProtectedClassLoaderAccessor protectedClassLoader)) {
-            logDispatcher.warn("Cannot fetch classes. Plugin main is not implementing {}.", ProtectedClassLoaderAccessor.class.getName());
+            this.logDispatcher.warn("Cannot fetch classes. Plugin main is not implementing {}.", ProtectedClassLoaderAccessor.class.getName());
             return Set.of();
         }
 
@@ -71,7 +73,7 @@ public abstract class AbstractRegistry {
                     .map(ClassPath.ClassInfo::load)
                     .collect(toSet());
         } catch (IOException e) {
-            logDispatcher.warn("Failed to fetch classes: {}", e.getMessage());
+            this.logDispatcher.warn("Failed to fetch classes: {}", e.getMessage());
             return Set.of();
         }
     }

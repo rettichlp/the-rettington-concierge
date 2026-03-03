@@ -1,12 +1,13 @@
 package de.rettichlp.therettingtonconcierge.registry.command;
 
 import com.google.inject.Injector;
+import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
 import de.rettichlp.therettingtonconcierge.registry.Ignore;
 import de.rettichlp.therettingtonconcierge.registry.command.internal.CommandFactory;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
@@ -20,8 +21,8 @@ import static io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMM
 public final class CommandRegistry extends AbstractRegistry {
 
     @Inject
-    public CommandRegistry(@NonNull Plugin plugin, @NonNull Injector injector) {
-        super(plugin, injector, "command");
+    public CommandRegistry(@NonNull JavaPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
+        super(plugin, injector, logDispatcher, "command");
     }
 
     @Override

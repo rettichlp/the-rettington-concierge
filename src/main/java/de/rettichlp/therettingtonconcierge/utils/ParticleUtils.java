@@ -1,7 +1,5 @@
 package de.rettichlp.therettingtonconcierge.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -11,8 +9,6 @@ import org.jspecify.annotations.NonNull;
 
 import static org.bukkit.Particle.DUST;
 
-@Getter
-@AllArgsConstructor
 public class ParticleUtils {
 
     /**

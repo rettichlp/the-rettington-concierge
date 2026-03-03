@@ -54,11 +54,11 @@ public final class CommandFactory {
     }
 
     /**
-     * Creates a new instance of {@link CommandFactory} using the given {@link ICommand}. This factory is responsible for
-     * managing and handling command-related operations.
+     * Creates a new instance of {@link CommandFactory} using the given {@link ICommand}. This factory is responsible for managing and
+     * handling command-related operations.
      *
-     * @param internalCommand the command to be encapsulated within the {@link CommandFactory}. It must implement the
-     *                        {@link ICommand} interface.
+     * @param internalCommand the command to be encapsulated within the {@link CommandFactory}. It must implement the {@link ICommand}
+     *                        interface.
      *
      * @return a new instance of {@link CommandFactory} initialized with the provided {@link ICommand}.
      */

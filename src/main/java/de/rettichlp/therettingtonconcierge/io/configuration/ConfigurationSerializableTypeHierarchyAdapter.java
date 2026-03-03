@@ -31,14 +31,15 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
     @Override
     public JsonElement serialize(ConfigurationSerializable configurationSerializable,
                                  Type type,
-                                 JsonSerializationContext jsonSerializationContext) {
+                                 @NonNull JsonSerializationContext jsonSerializationContext) {
         return jsonSerializationContext.serialize(serializeToMap(configurationSerializable), MAP_TYPE.getType());
     }
 
     @Override
     public ConfigurationSerializable deserialize(JsonElement jsonElement,
                                                  Type type,
-                                                 JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                                                 @NonNull JsonDeserializationContext jsonDeserializationContext) throws
+                                                                                                                 JsonParseException {
         return deserializeFromMap(jsonDeserializationContext.deserialize(jsonElement, MAP_TYPE.getType()));
     }
 
@@ -63,7 +64,7 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
         }
     }
 
-    private void deserializeInner(Map<String, Object> map) {
+    private void deserializeInner(@NonNull Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             Object raw = entry.getValue();
             if (raw instanceof Map<?, ?>) {
@@ -87,7 +88,7 @@ public final class ConfigurationSerializableTypeHierarchyAdapter implements Json
         }
     }
 
-    private Number narrowNumberType(Number number) {
+    private Number narrowNumberType(@NonNull Number number) {
         long asLong = number.longValue();
         if (number.doubleValue() == (double) asLong) {
             return asLong <= MAX_VALUE && asLong >= MIN_VALUE ? number.intValue() : asLong;

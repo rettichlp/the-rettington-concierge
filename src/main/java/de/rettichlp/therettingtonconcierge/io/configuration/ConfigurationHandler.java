@@ -34,11 +34,11 @@ public class ConfigurationHandler {
             .disable(WRITE_DATES_AS_TIMESTAMPS);
 
     private final String namespace;
-    private final java.io.File pluginFolder;
+    private final File pluginFolder;
 
     public ConfigurationHandler(String namespace) {
         this.namespace = namespace;
-        this.pluginFolder = new java.io.File("plugins/" + this.namespace);
+        this.pluginFolder = new File("plugins/" + namespace);
     }
 
     /**

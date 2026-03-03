@@ -44,7 +44,7 @@ public class LogDispatcher {
      * @param rawMessage the raw message template to be formatted with the provided arguments
      * @param args       the arguments to format the raw message
      */
-    public void debug(Class<?> clazz, String rawMessage, Object... args) {
+    public void debug(@NonNull Class<?> clazz, String rawMessage, Object... args) {
         String formattedMessage = "[" + clazz.getSimpleName() + "] " + log.getMessageFactory().newMessage(rawMessage, args).getFormattedMessage();
         this.bukkitLogger.log(INFO, "[DEBUG] " + formattedMessage);
         getOnlinePlayers().stream()

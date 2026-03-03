@@ -25,13 +25,9 @@ public class GsonConfiguration {
             .addSerializationExclusionStrategy(new ExclusionSerializationStrategy())
             .addDeserializationExclusionStrategy(new ExclusionDeserializationStrategy())
             .registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableTypeHierarchyAdapter())
-            .registerTypeAdapter(ZonedDateTime.class, (JsonDeserializer<ZonedDateTime>) (json, type, jsonDeserializationContext) ->
-                    ZonedDateTime.parse(json.getAsJsonPrimitive().getAsString()))
-            .registerTypeAdapter(ZonedDateTime.class, (JsonSerializer<ZonedDateTime>) (date, type, jsonSerializationContext) ->
-                    new JsonPrimitive(date.format(ISO_ZONED_DATE_TIME)))
-            .registerTypeAdapter(Instant.class, (JsonDeserializer<Instant>) (json, type, jsonDeserializationContext) ->
-                    Instant.parse(json.getAsJsonPrimitive().getAsString()))
-            .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>) (instant, type, jsonSerializationContext) ->
-                    new JsonPrimitive(instant.toString()))
+            .registerTypeAdapter(ZonedDateTime.class, (JsonDeserializer<ZonedDateTime>) (json, _, _) -> ZonedDateTime.parse(json.getAsJsonPrimitive().getAsString()))
+            .registerTypeAdapter(ZonedDateTime.class, (JsonSerializer<ZonedDateTime>) (date, _, _) -> new JsonPrimitive(date.format(ISO_ZONED_DATE_TIME)))
+            .registerTypeAdapter(Instant.class, (JsonDeserializer<Instant>) (json, _, _) -> Instant.parse(json.getAsJsonPrimitive().getAsString()))
+            .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>) (instant, _, _) -> new JsonPrimitive(instant.toString()))
             .create();
 }

@@ -1,9 +1,10 @@
 package de.rettichlp.therettingtonconcierge.registry.command;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Annotation used to define metadata for a command within the system. This information is utilized for registering and managing
@@ -15,8 +16,8 @@ import java.lang.annotation.Target;
  * <p>
  * This annotation is intended to be applied at the type level, marking classes that implement command logic.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
 public @interface Command {
 
     /**

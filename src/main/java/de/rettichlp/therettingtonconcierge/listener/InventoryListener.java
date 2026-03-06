@@ -1,7 +1,8 @@
 package de.rettichlp.therettingtonconcierge.listener;
 
+import com.google.inject.Inject;
 import de.rettichlp.therettingtonconcierge.inventory.RegisteredInventory;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
@@ -24,15 +26,17 @@ import java.util.Optional;
 import static de.rettichlp.therettingtonconcierge.inventory.RegisteredInventory.Builder.REGISTERED_INVENTORIES;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
-import static org.bukkit.Material.BLACK_STAINED_GLASS_PANE;
-import static org.bukkit.Material.WHITE_STAINED_GLASS_PANE;
+import static org.bukkit.Bukkit.getScheduler;
+import static org.bukkit.Material.STRUCTURE_VOID;
 import static org.bukkit.event.EventPriority.HIGH;
 import static org.bukkit.event.EventPriority.HIGHEST;
 
-@NoArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__({ @Inject }))
 public class InventoryListener implements Listener {
 
     private static final Map<Player, Long> SPAM_PREVENTION = new HashMap<>();
+
+    private final JavaPlugin plugin;
 
     @EventHandler(priority = HIGH)
     public void onInventoryClick(@NonNull InventoryClickEvent event) {
@@ -81,7 +85,7 @@ public class InventoryListener implements Listener {
 
                 Sound sound = registeredInventory.getClickSound();
                 Material type = currentItem.getType();
-                if (!type.isAir() && type != WHITE_STAINED_GLASS_PANE && type != BLACK_STAINED_GLASS_PANE && sound != null) {
+                if (!type.isAir() && type != STRUCTURE_VOID && sound != null) {
                     player.playSound(player.getLocation(), sound, 1.0F, 1.0F);
                 }
             }
@@ -102,12 +106,15 @@ public class InventoryListener implements Listener {
         Optional<RegisteredInventory> optionalRegisteredInventory = getOptionalRegisteredInventory(inventory);
         optionalRegisteredInventory.ifPresent(registeredInventory -> registeredInventory.setOpen(false));
 
-        Optional<RegisteredInventory.InventoryCloseFunction<Player, Inventory, InventoryCloseEvent.Reason>> optionalInventoryCloseFunction = optionalRegisteredInventory
-                .map(RegisteredInventory::getCloseFunction);
+        Optional<RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason>> optionalInventoryClosedFunction = optionalRegisteredInventory
+                .map(RegisteredInventory::getClosedFunction);
 
-        if (optionalInventoryCloseFunction.isPresent() && event.getPlayer() instanceof Player player) {
-            RegisteredInventory.InventoryCloseFunction<Player, Inventory, InventoryCloseEvent.Reason> inventoryCloseFunction = optionalInventoryCloseFunction.get();
-            inventoryCloseFunction.apply(player, inventory, reason);
+        if (optionalInventoryClosedFunction.isPresent() && event.getPlayer() instanceof Player player) {
+            // run one tick later, so the inventory was closed correctly before calling this function
+            getScheduler().runTaskLater(this.plugin, () -> {
+                RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason> inventoryClosedFunction = optionalInventoryClosedFunction.get();
+                inventoryClosedFunction.apply(player, inventory, reason);
+            }, 1);
         }
     }
 

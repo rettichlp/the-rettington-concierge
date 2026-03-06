@@ -41,7 +41,7 @@ public class RegisteredInventory {
     private final NonNullList<InventorySlot> inventorySlots;
     private final Sound clickSound;
     private final boolean allowPlayerInventoryInteraction;
-    private final InventoryCloseFunction<Player, Inventory, Reason> closeFunction;
+    private final InventoryClosedFunction<Player, Inventory, Reason> closedFunction;
     private boolean open;
 
     /**
@@ -97,7 +97,7 @@ public class RegisteredInventory {
      * @param <Inventory> the type representing the inventory being operated on
      * @param <Reason>    the type representing the reason or context for the operation
      */
-    public interface InventoryCloseFunction<Player, Inventory, Reason> {
+    public interface InventoryClosedFunction<Player, Inventory, Reason> {
 
         /**
          * Executes a specific action using the provided player, inventory, and reason.
@@ -136,7 +136,7 @@ public class RegisteredInventory {
         private Sound openSound;
         private Sound clickSound = BLOCK_WOODEN_PRESSURE_PLATE_CLICK_OFF;
         private boolean allowPlayerInventoryInteraction = false;
-        private InventoryCloseFunction<Player, Inventory, Reason> closeFunction = (_, _, _) -> {
+        private InventoryClosedFunction<Player, Inventory, Reason> closedFunction = (_, _, _) -> {
         };
 
         /**
@@ -462,13 +462,13 @@ public class RegisteredInventory {
          * Sets a function to be executed when an inventory is closed. The provided function defines the behavior that occurs when the
          * inventory is closed, including any actions or side effects involving the player, inventory, and the reason for closure.
          *
-         * @param closeFunction the function to execute when the inventory is closed, which takes the player, inventory, and reason as
+         * @param closedFunction the function to execute when the inventory is closed, which takes the player, inventory, and reason as
          *                      parameters
          *
          * @return the {@code Builder} instance for method chaining
          */
-        public Builder onClose(InventoryCloseFunction<Player, Inventory, Reason> closeFunction) {
-            this.closeFunction = closeFunction;
+        public Builder onClosed(InventoryClosedFunction<Player, Inventory, Reason> closedFunction) {
+            this.closedFunction = closedFunction;
             return this;
         }
 
@@ -498,7 +498,7 @@ public class RegisteredInventory {
                 inventory.setItem(i, inventorySlot.itemStack());
             }
 
-            RegisteredInventory registeredInventory = new RegisteredInventory(this.title, inventory, this.inventorySlots, this.clickSound, this.allowPlayerInventoryInteraction, this.closeFunction);
+            RegisteredInventory registeredInventory = new RegisteredInventory(this.title, inventory, this.inventorySlots, this.clickSound, this.allowPlayerInventoryInteraction, this.closedFunction);
             REGISTERED_INVENTORIES.add(registeredInventory);
 
             return registeredInventory;

@@ -24,10 +24,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static de.rettichlp.therettingtonconcierge.inventory.RegisteredInventory.Builder.REGISTERED_INVENTORIES;
+import static de.rettichlp.therettingtonconcierge.utils.TimeUtils.runSyncLater;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
-import static org.bukkit.Material.BLACK_STAINED_GLASS_PANE;
-import static org.bukkit.Material.WHITE_STAINED_GLASS_PANE;
+import static org.bukkit.Material.STRUCTURE_VOID;
 import static org.bukkit.event.EventPriority.HIGH;
 import static org.bukkit.event.EventPriority.HIGHEST;
 
@@ -85,7 +85,7 @@ public class InventoryListener implements Listener {
 
                 Sound sound = registeredInventory.getClickSound();
                 Material type = currentItem.getType();
-                if (!type.isAir() && type != WHITE_STAINED_GLASS_PANE && type != BLACK_STAINED_GLASS_PANE && sound != null) {
+                if (!type.isAir() && type != STRUCTURE_VOID && sound != null) {
                     player.playSound(player.getLocation(), sound, 1.0F, 1.0F);
                 }
             }
@@ -106,12 +106,15 @@ public class InventoryListener implements Listener {
         Optional<RegisteredInventory> optionalRegisteredInventory = getOptionalRegisteredInventory(inventory);
         optionalRegisteredInventory.ifPresent(registeredInventory -> registeredInventory.setOpen(false));
 
-        Optional<RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason>> optionalInventoryCloseFunction = optionalRegisteredInventory
+        Optional<RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason>> optionalInventoryClosedFunction = optionalRegisteredInventory
                 .map(RegisteredInventory::getClosedFunction);
 
-        if (optionalInventoryCloseFunction.isPresent() && event.getPlayer() instanceof Player player) {
-            RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason> inventoryClosedFunction = optionalInventoryCloseFunction.get();
-            inventoryClosedFunction.apply(player, inventory, reason);
+        if (optionalInventoryClosedFunction.isPresent() && event.getPlayer() instanceof Player player) {
+            // run one tick later, so the inventory was closed correctly before calling this function
+            runSyncLater(this.plugin, () -> {
+                RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason> inventoryClosedFunction = optionalInventoryClosedFunction.get();
+                inventoryClosedFunction.apply(player, inventory, reason);
+            }, 1);
         }
     }
 

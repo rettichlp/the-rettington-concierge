@@ -1,11 +1,12 @@
 package de.rettichlp.therettingtonconcierge.listener;
 
+import com.google.inject.Inject;
 import de.rettichlp.therettingtonconcierge.events.PlayerHotbarItemFocusGetEvent;
 import de.rettichlp.therettingtonconcierge.events.PlayerHotbarItemFocusLostEvent;
 import de.rettichlp.therettingtonconcierge.events.PlayerMoveBlockEvent;
 import de.rettichlp.therettingtonconcierge.events.PlayerMoveChunkEvent;
 import io.papermc.paper.event.packet.ClientTickEndEvent;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
@@ -20,12 +22,14 @@ import java.util.Map;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
-@NoArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__({ @Inject }))
 public class TRCEventListener implements Listener {
 
     private static final Map<Player, Block> PLAYER_PREVIOUS_BLOCK = new HashMap<>();
     private static final Map<Player, Chunk> PLAYER_PREVIOUS_CHUNK = new HashMap<>();
     private static final Map<Player, ItemStack> LAST_HELD_ITEM = new HashMap<>();
+
+    private final JavaPlugin plugin;
 
     @EventHandler
     public void onPlayerMove(@NonNull PlayerMoveEvent event) {

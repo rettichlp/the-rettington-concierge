@@ -1,8 +1,5 @@
 package de.rettichlp.therettingtonconcierge.utils;
 
-import com.google.inject.Inject;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
@@ -28,7 +25,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.compile;
-import static org.bukkit.Bukkit.getScheduler;
 
 public class TimeUtils {
 
@@ -38,9 +34,6 @@ public class TimeUtils {
     private static final DateTimeFormatter TIME_FORMAT = ofPattern("HH:mm:ss", GERMAN);
     private static final DateTimeFormatter DATE_TIME_FORMAT = ofPattern("dd.MM.yyyy HH:mm:ss", GERMAN);
     private static final Pattern PT_DURATION_PATTERN = compile("(\\d+)([smhd])");
-
-    @Inject
-    private static JavaPlugin plugin;
 
     /**
      * Retrieves the current date and time using the predefined time zone.
@@ -143,83 +136,5 @@ public class TimeUtils {
         }
 
         return duration;
-    }
-
-    /**
-     * Schedules the provided {@link Runnable} to be executed asynchronously immediately. The task will be executed once and will not
-     * be repeated.
-     *
-     * @param runnable the {@link Runnable} to be executed asynchronously. Must not be null.
-     *
-     * @return the {@link BukkitTask} representing the scheduled task.
-     */
-    public static @NonNull BukkitTask runAsync(Runnable runnable) {
-        return getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0, -1);
-    }
-
-    /**
-     * Schedules the provided {@link Runnable} to be executed synchronously immediately. The task will be executed once and will not be
-     * repeated.
-     *
-     * @param runnable the {@link Runnable} to be executed synchronously. Must not be null.
-     *
-     * @return the {@link BukkitTask} representing the scheduled task.
-     */
-    public static @NonNull BukkitTask runSync(Runnable runnable) {
-        return getScheduler().runTaskTimer(plugin, runnable, 0, -1);
-    }
-
-    /**
-     * Schedules the provided {@link Runnable} to be executed asynchronously after a specified delay. The task will be executed once
-     * and will not be repeated.
-     *
-     * @param runnable the {@link Runnable} to be executed asynchronously. Must not be null.
-     * @param delay    the delay, in ticks, before the task is first executed. Must be non-negative.
-     *
-     * @return the {@link BukkitTask} representing the scheduled task.
-     */
-    public static @NonNull BukkitTask runAsyncLater(Runnable runnable, long delay) {
-        return getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, -1);
-    }
-
-    /**
-     * Schedules the provided {@link Runnable} to be executed synchronously after a specified delay. The task will be executed once and
-     * will not be repeated.
-     *
-     * @param runnable the {@link Runnable} to be executed synchronously. Must not be null.
-     * @param delay    the delay, in ticks, before the task is first executed. Must be non-negative.
-     *
-     * @return the {@link BukkitTask} representing the scheduled task.
-     */
-    public static @NonNull BukkitTask runSyncLater(Runnable runnable, long delay) {
-        return getScheduler().runTaskTimer(plugin, runnable, delay, -1);
-    }
-
-    /**
-     * Schedules the provided {@link Runnable} to be executed asynchronously at a fixed rate. The task will first execute after the
-     * specified delay and then continue to execute periodically with the given interval.
-     *
-     * @param runnable the {@link Runnable} to be executed asynchronously. Must not be null.
-     * @param delay    the delay, in ticks, before the task is first executed. Must be non-negative.
-     * @param period   the interval, in ticks, between later executions of the task. Must be non-negative.
-     *
-     * @return the {@link BukkitTask} representing the scheduled task.
-     */
-    public static @NonNull BukkitTask runAsyncRepeating(Runnable runnable, long delay, long period) {
-        return getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period);
-    }
-
-    /**
-     * Schedules the provided {@link Runnable} to be executed synchronously at a fixed rate. The task will first execute after the
-     * specified delay and then continue to execute periodically with the given interval.
-     *
-     * @param runnable the {@link Runnable} to be executed synchronously. Must not be null.
-     * @param delay    the delay, in ticks, before the task is first executed. Must be non-negative.
-     * @param period   the interval, in ticks, between later executions of the task. Must be non-negative.
-     *
-     * @return the {@link BukkitTask} representing the scheduled task.
-     */
-    public static @NonNull BukkitTask runSyncRepeating(Runnable runnable, long delay, long period) {
-        return getScheduler().runTaskTimer(plugin, runnable, delay, period);
     }
 }

@@ -102,12 +102,12 @@ public class InventoryListener implements Listener {
         Optional<RegisteredInventory> optionalRegisteredInventory = getOptionalRegisteredInventory(inventory);
         optionalRegisteredInventory.ifPresent(registeredInventory -> registeredInventory.setOpen(false));
 
-        Optional<RegisteredInventory.InventoryCloseFunction<Player, Inventory, InventoryCloseEvent.Reason>> optionalInventoryCloseFunction = optionalRegisteredInventory
-                .map(RegisteredInventory::getCloseFunction);
+        Optional<RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason>> optionalInventoryCloseFunction = optionalRegisteredInventory
+                .map(RegisteredInventory::getClosedFunction);
 
         if (optionalInventoryCloseFunction.isPresent() && event.getPlayer() instanceof Player player) {
-            RegisteredInventory.InventoryCloseFunction<Player, Inventory, InventoryCloseEvent.Reason> inventoryCloseFunction = optionalInventoryCloseFunction.get();
-            inventoryCloseFunction.apply(player, inventory, reason);
+            RegisteredInventory.InventoryClosedFunction<Player, Inventory, InventoryCloseEvent.Reason> inventoryClosedFunction = optionalInventoryCloseFunction.get();
+            inventoryClosedFunction.apply(player, inventory, reason);
         }
     }
 

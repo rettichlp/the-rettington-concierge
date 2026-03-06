@@ -10,6 +10,7 @@ import de.rettichlp.therettingtonconcierge.io.api.serialization.ExclusionSeriali
 import de.rettichlp.therettingtonconcierge.io.configuration.ConfigurationSerializableTypeHierarchyAdapter;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
@@ -29,5 +30,7 @@ public class GsonConfiguration {
             .registerTypeAdapter(ZonedDateTime.class, (JsonSerializer<ZonedDateTime>) (date, _, _) -> new JsonPrimitive(date.format(ISO_ZONED_DATE_TIME)))
             .registerTypeAdapter(Instant.class, (JsonDeserializer<Instant>) (json, _, _) -> Instant.parse(json.getAsJsonPrimitive().getAsString()))
             .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>) (instant, _, _) -> new JsonPrimitive(instant.toString()))
+            .registerTypeAdapter(Duration.class, (JsonDeserializer<Duration>) (json, _, _) -> Duration.parse(json.getAsJsonPrimitive().getAsString()))
+            .registerTypeAdapter(Duration.class, (JsonSerializer<Duration>) (duration, _, _) -> new JsonPrimitive(duration.toString()))
             .create();
 }

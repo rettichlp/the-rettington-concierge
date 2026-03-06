@@ -1,7 +1,8 @@
 package de.rettichlp.therettingtonconcierge.listener;
 
+import com.google.inject.Inject;
 import de.rettichlp.therettingtonconcierge.inventory.RegisteredInventory;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
@@ -29,10 +31,12 @@ import static org.bukkit.Material.WHITE_STAINED_GLASS_PANE;
 import static org.bukkit.event.EventPriority.HIGH;
 import static org.bukkit.event.EventPriority.HIGHEST;
 
-@NoArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__({ @Inject }))
 public class InventoryListener implements Listener {
 
     private static final Map<Player, Long> SPAM_PREVENTION = new HashMap<>();
+
+    private final JavaPlugin plugin;
 
     @EventHandler(priority = HIGH)
     public void onInventoryClick(@NonNull InventoryClickEvent event) {

@@ -463,7 +463,7 @@ public class RegisteredInventory {
          * inventory is closed, including any actions or side effects involving the player, inventory, and the reason for closure.
          *
          * @param closedFunction the function to execute when the inventory is closed, which takes the player, inventory, and reason as
-         *                      parameters
+         *                       parameters
          *
          * @return the {@code Builder} instance for method chaining
          */

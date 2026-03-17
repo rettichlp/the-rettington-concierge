@@ -47,7 +47,7 @@ dependencies {
     implementation("com.google.code.gson", "gson", "2.13.2")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
-    implementation("org.springframework", "spring-webflux", "7.0.5")
+    implementation("org.springframework", "spring-webflux", "7.0.6")
 
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb
     implementation("org.springframework.data", "spring-data-mongodb", "5.0.3")

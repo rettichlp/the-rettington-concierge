@@ -124,7 +124,7 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
     }
 
     private void loadTranslationFile(Locale locale) {
-        ResourceBundle bundle = getBundle(this.namespace, locale, UTF8ResourceBundleControl.get());
+        ResourceBundle bundle = getBundle(this.namespace, locale);
         this.translationStore.registerAll(locale, bundle, false);
         this.logDispatcher.debug(getClass(), "Registered bundle {} for locale {}", this.namespace, locale);
     }

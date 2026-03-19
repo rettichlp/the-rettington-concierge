@@ -179,6 +179,8 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
         if (this instanceof ISortable<?> iSortable) {
+            this.sortComparatorId = iSortable.comparators().keySet().stream().findFirst().orElse("");
+
             ItemStack sortItemStack = Item.builder(BAMBOO_SHELF)
                     .displayName(iSortable.sortItemName())
                     .lore(iSortable.sortItemTooltip(this.sortComparatorId))

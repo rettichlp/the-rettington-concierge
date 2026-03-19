@@ -35,9 +35,9 @@ import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
 public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private int currentPage = 0;
-    private String filter = null;
-    private String search = null;
-    private String sort = null;
+    private String filter = "";
+    private String search = "";
+    private String sort = "";
 
     /**
      * Retrieves an array of elements to be displayed in the game menu for the specified player and page. This method typically returns
@@ -118,7 +118,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
         Stream<E> elementStream = stream(elements(player));
 
-        if (this instanceof IFilterable<?> iFilterable && this.filter != null && !this.filter.isEmpty()) {
+        if (this instanceof IFilterable<?> iFilterable && !this.filter.isEmpty()) {
             Predicate<E> predicate = (Predicate<E>) iFilterable.filters().get(this.filter);
 
             if (predicate != null) {
@@ -126,11 +126,11 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             }
         }
 
-        if (this instanceof ISearchable<?> iSearchable && this.search != null && !this.search.isEmpty()) {
+        if (this instanceof ISearchable<?> iSearchable && !this.search.isEmpty()) {
             elementStream = elementStream.filter(e -> ((ISearchable<E>) iSearchable).searchFunction(e, this.search));
         }
 
-        if (this instanceof ISortable<?> iSortable && this.sort != null && this.sort.isEmpty()) {
+        if (this instanceof ISortable<?> iSortable && this.sort.isEmpty()) {
             Comparator<E> comparator = (Comparator<E>) iSortable.comparators().get(this.sort);
 
             if (comparator != null) {
@@ -167,13 +167,13 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             ItemStack sortItemStack = Item.builder(HOPPER)
                     .displayName(iFilterable.filterItemName())
                     .lore(iFilterable.filterItemTooltip(this.filter))
-                    .glint(this.search != null && !this.search.isEmpty())
+                    .glint(!this.search.isEmpty())
                     .build();
 
             registeredInventoryBuilder
                     .item(-7, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
-                            this.filter = null;
+                            this.filter = "";
                             open(player, this.currentPage); // reopen at the same page
                             return;
                         }
@@ -191,13 +191,13 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             ItemStack searchItemStack = Item.builder(SPYGLASS)
                     .displayName(iSearchable.searchItemName())
                     .lore(iSearchable.searchItemTooltip(this.search))
-                    .glint(this.search != null && !this.search.isEmpty())
+                    .glint(!this.search.isEmpty())
                     .build();
 
             registeredInventoryBuilder
                     .item(-5, searchItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
-                            this.search = null;
+                            this.search = "";
                             open(player, this.currentPage); // reopen at the same page
                             return;
                         }
@@ -216,13 +216,13 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             ItemStack sortItemStack = Item.builder(BAMBOO_SHELF)
                     .displayName(iSortable.sortItemName())
                     .lore(iSortable.sortItemTooltip(this.sort))
-                    .glint(this.sort != null && !this.sort.isEmpty())
+                    .glint(!this.sort.isEmpty())
                     .build();
 
             registeredInventoryBuilder
                     .item(-3, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
-                            this.filter = null;
+                            this.sort = "";
                             open(player, this.currentPage); // reopen at the same page
                             return;
                         }

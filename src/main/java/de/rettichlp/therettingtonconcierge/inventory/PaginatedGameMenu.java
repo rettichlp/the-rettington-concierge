@@ -130,7 +130,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             elementStream = elementStream.filter(e -> ((ISearchable<E>) iSearchable).searchFunction(e, this.search));
         }
 
-        if (this instanceof ISortable<?> iSortable && this.sort.isEmpty()) {
+        if (this instanceof ISortable<?> iSortable && !this.sort.isEmpty()) {
             Comparator<E> comparator = (Comparator<E>) iSortable.comparators().get(this.sort);
 
             if (comparator != null) {

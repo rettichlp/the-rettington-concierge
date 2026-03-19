@@ -1,35 +1,35 @@
 package de.rettichlp.therettingtonconcierge.utils;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import static java.util.Arrays.stream;
-import static net.kyori.adventure.translation.GlobalTranslator.render;
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.text;
 
 public class TextUtils {
 
     /**
-     * Converts a translation key and optional arguments into a localized {@link Component} for display, while taking into account the
-     * specified locale.
+     * Converts the given object into a {@link Component} representation. If the object is already a {@link Component}, it is returned
+     * as-is. If the object is a {@link String}, it is converted into a text {@link Component}. For all other object types, the
+     * {@code toString()} representation of the object is converted into a text {@link Component}.
      *
-     * @param translationKey The translation key representing the text to be localized. Must not be null.
-     * @param locale         The locale for which the text should be localized. Must not be null.
-     * @param args           Optional arguments to be interpolated into the localized text. Can be empty.
+     * @param object The object to be converted into a {@link Component}. Must not be null.
      *
-     * @return A non-null {@link Component} containing the localized text with any provided arguments.
+     * @return A {@link Component} representing the provided object.
      */
-    public static @NonNull Component translationAsComponent(@NonNull String translationKey, @NonNull Locale locale, Object... args) {
-        List<@NotNull TextComponent> argComponents = stream(args).map(Object::toString).map(Component::text).toList();
-        TranslatableComponent translatable = Component.translatable(translationKey, argComponents);
-        return render(translatable, locale);
+    public static Component objectToComponent(Object object) {
+        if (object instanceof Component component) {
+            return component;
+        } else if (object instanceof String string) {
+            return text(string);
+        } else {
+            return text(object.toString());
+        }
     }
 
     /**
@@ -64,6 +64,26 @@ public class TextUtils {
             if (!currentLine.isEmpty()) {
                 lines.add(currentLine.toString().trim());
             }
+        }
+
+        return lines;
+    }
+
+    public static @NonNull List<Component> toLines(@NonNull Component component) {
+        List<Component> lines = new ArrayList<>();
+        Component currentLineComponent = component.children().isEmpty() ? component : empty();
+
+        for (Component child : component.children()) {
+            if (child.equals(newline())) {
+                lines.add(currentLineComponent);
+                currentLineComponent = empty();
+            } else {
+                currentLineComponent = currentLineComponent.append(child);
+            }
+        }
+
+        if (!currentLineComponent.equals(empty())) {
+            lines.add(currentLineComponent);
         }
 
         return lines;

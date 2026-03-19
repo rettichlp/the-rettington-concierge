@@ -22,7 +22,7 @@ import java.util.Map;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
-@RequiredArgsConstructor(onConstructor = @__({ @Inject }))
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TRCEventListener implements Listener {
 
     private static final Map<Player, Block> PLAYER_PREVIOUS_BLOCK = new HashMap<>();

@@ -1,7 +1,9 @@
 package de.rettichlp.therettingtonconcierge.inventory;
 
 import de.rettichlp.therettingtonconcierge.inventory.item.Item;
+import de.rettichlp.therettingtonconcierge.ui.dialog.TextInputDialog;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -9,17 +11,24 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
 
 import static java.lang.Math.min;
-import static java.util.Arrays.copyOfRange;
+import static java.util.Arrays.stream;
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
+import static net.kyori.adventure.translation.GlobalTranslator.render;
 import static org.bukkit.Material.PAPER;
+import static org.bukkit.Material.SPYGLASS;
+import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
 
 @Getter
 public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private int currentPage = 0;
+    private String searchFilter = "";
 
     /**
      * Retrieves an array of elements to be displayed in the game menu for the specified player and page. This method typically returns
@@ -63,6 +72,33 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         }
 
         addPageControl(registeredInventoryBuilder, player);
+
+        // add search item
+        if (this instanceof ISearchable<?> iSearchable) {
+            Locale locale = player.locale();
+
+            ItemStack searchItemStack = Item.builder(SPYGLASS)
+                    .displayName(render(iSearchable.searchItemTitle(), locale))
+                    .lore(iSearchable.searchItemTooltip(this.searchFilter))
+                    .glint(!this.searchFilter.isEmpty())
+                    .build();
+
+            registeredInventoryBuilder
+                    .item(-5, searchItemStack, (_, _, clickType, _) -> {
+                        if (clickType == SHIFT_LEFT) {
+                            this.searchFilter = "";
+                            open(player, this.currentPage); // reopen at the same page
+                            return;
+                        }
+
+                        Component title = render(translatable("gui.language.search"), locale);
+                        Component label = render(translatable("ui.search.label", this.searchFilter), locale);
+                        new TextInputDialog(player, title, label, s -> {
+                            this.searchFilter = s;
+                            open(player); // reopen at page 1
+                        }).open();
+                    });
+        }
     }
 
     @Override
@@ -91,11 +127,21 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         registeredInventoryBuilder.openInventory(player);
     }
 
+    @SuppressWarnings("unchecked")
     private @NonNull @Unmodifiable List<E> getPageElements(Player player) {
         int pageSize = size() - 9; // the last row is reserved for page control
-        E[] elements = elements(player);
-        E[] pageElements = copyOfRange(elements, (this.currentPage - 1) * pageSize, min(elements.length, this.currentPage * pageSize));
-        return List.of(pageElements);
+
+        Stream<E> elementStream = stream(elements(player));
+
+        if (this instanceof ISearchable<?> iSearchable) {
+            elementStream = elementStream.filter(e -> ((ISearchable<E>) iSearchable).searchFunction(e, this.searchFilter));
+        }
+
+        List<E> elements = elementStream.toList();
+
+        int from = (this.currentPage - 1) * pageSize;
+        int to = min(elements.size(), this.currentPage * pageSize);
+        return elements.subList(from, to);
     }
 
     private void addPageControl(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {

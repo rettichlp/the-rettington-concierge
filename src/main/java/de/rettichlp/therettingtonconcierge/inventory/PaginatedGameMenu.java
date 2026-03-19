@@ -10,16 +10,20 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 import static java.lang.Math.min;
 import static java.util.Arrays.stream;
+import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
 import static net.kyori.adventure.translation.GlobalTranslator.render;
+import static org.bukkit.Material.BAMBOO_SHELF;
 import static org.bukkit.Material.PAPER;
 import static org.bukkit.Material.SPYGLASS;
 import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
@@ -29,6 +33,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private int currentPage = 0;
     private String searchFilter = "";
+    private String sortComparatorId = "";
 
     /**
      * Retrieves an array of elements to be displayed in the game menu for the specified player and page. This method typically returns
@@ -72,33 +77,8 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         }
 
         addPageControl(registeredInventoryBuilder, player);
-
-        // add search item
-        if (this instanceof ISearchable<?> iSearchable) {
-            Locale locale = player.locale();
-
-            ItemStack searchItemStack = Item.builder(SPYGLASS)
-                    .displayName(render(iSearchable.searchItemTitle(), locale))
-                    .lore(iSearchable.searchItemTooltip(this.searchFilter))
-                    .glint(!this.searchFilter.isEmpty())
-                    .build();
-
-            registeredInventoryBuilder
-                    .item(-5, searchItemStack, (_, _, clickType, _) -> {
-                        if (clickType == SHIFT_LEFT) {
-                            this.searchFilter = "";
-                            open(player, this.currentPage); // reopen at the same page
-                            return;
-                        }
-
-                        Component title = render(translatable("gui.language.search"), locale);
-                        Component label = render(translatable("ui.search.label", this.searchFilter), locale);
-                        new TextInputDialog(player, title, label, s -> {
-                            this.searchFilter = s;
-                            open(player); // reopen at page 1
-                        }).open();
-                    });
-        }
+        addSearchItemStack(registeredInventoryBuilder, player);
+        addSortItemStack(registeredInventoryBuilder, player);
     }
 
     @Override
@@ -133,8 +113,17 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
         Stream<E> elementStream = stream(elements(player));
 
-        if (this instanceof ISearchable<?> iSearchable) {
+        if (this instanceof ISearchable<?> iSearchable && !this.searchFilter.isBlank()) {
             elementStream = elementStream.filter(e -> ((ISearchable<E>) iSearchable).searchFunction(e, this.searchFilter));
+        }
+
+        if (this instanceof ISortable<?> iSortable && !this.sortComparatorId.isBlank()) {
+            // get comparator
+            Comparator<E> comparator = (Comparator<E>) iSortable.comparators().get(this.sortComparatorId);
+
+            if (comparator != null) {
+                elementStream = elementStream.sorted(comparator);
+            }
         }
 
         List<E> elements = elementStream.toList();
@@ -158,6 +147,52 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
                             .build(), (clicker, _, _, _) -> open(clicker, this.currentPage + 1));
+        }
+    }
+
+    private void addSearchItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
+        if (this instanceof ISearchable<?> iSearchable) {
+            Locale locale = player.locale();
+
+            ItemStack searchItemStack = Item.builder(SPYGLASS)
+                    .displayName(iSearchable.searchItemName())
+                    .lore(iSearchable.searchItemTooltip(this.searchFilter))
+                    .glint(!this.searchFilter.isEmpty())
+                    .build();
+
+            registeredInventoryBuilder
+                    .item(-5, searchItemStack, (_, _, clickType, _) -> {
+                        if (clickType == SHIFT_LEFT) {
+                            this.searchFilter = "";
+                            open(player, this.currentPage); // reopen at the same page
+                            return;
+                        }
+
+                        Component title = render(translatable("gui.language.search"), locale);
+                        new TextInputDialog(player, title, empty(), s -> {
+                            this.searchFilter = s;
+                            open(player); // reopen at page 1
+                        }).open();
+                    });
+        }
+    }
+
+    private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
+        if (this instanceof ISortable<?> iSortable) {
+            this.sortComparatorId = iSortable.comparators().keySet().stream().findFirst().orElse("");
+
+            ItemStack sortItemStack = Item.builder(BAMBOO_SHELF)
+                    .displayName(iSortable.sortItemName())
+                    .lore(iSortable.sortItemTooltip(this.sortComparatorId))
+                    .build();
+
+            registeredInventoryBuilder
+                    .item(-3, sortItemStack, (_, _, _, _) -> {
+                        List<String> keys = new ArrayList<>(iSortable.comparators().keySet());
+                        int nextIndex = (keys.indexOf(this.sortComparatorId) + 1) % keys.size();
+                        this.sortComparatorId = keys.get(nextIndex);
+                        open(player, this.currentPage);
+                    });
         }
     }
 }

@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.min;
 import static java.util.Arrays.stream;
+import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
@@ -167,8 +168,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                         }
 
                         Component title = render(translatable("gui.language.search"), locale);
-                        Component label = render(translatable("ui.search.label", this.searchFilter), locale);
-                        new TextInputDialog(player, title, label, s -> {
+                        new TextInputDialog(player, title, empty(), s -> {
                             this.searchFilter = s;
                             open(player); // reopen at page 1
                         }).open();

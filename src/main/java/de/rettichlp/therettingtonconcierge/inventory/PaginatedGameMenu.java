@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -29,6 +31,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private int currentPage = 0;
     private String searchFilter = "";
+    private String sortComparatorId = "";
 
     /**
      * Retrieves an array of elements to be displayed in the game menu for the specified player and page. This method typically returns
@@ -72,33 +75,8 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         }
 
         addPageControl(registeredInventoryBuilder, player);
-
-        // add search item
-        if (this instanceof ISearchable<?> iSearchable) {
-            Locale locale = player.locale();
-
-            ItemStack searchItemStack = Item.builder(SPYGLASS)
-                    .displayName(render(iSearchable.searchItemTitle(), locale))
-                    .lore(iSearchable.searchItemTooltip(this.searchFilter))
-                    .glint(!this.searchFilter.isEmpty())
-                    .build();
-
-            registeredInventoryBuilder
-                    .item(-5, searchItemStack, (_, _, clickType, _) -> {
-                        if (clickType == SHIFT_LEFT) {
-                            this.searchFilter = "";
-                            open(player, this.currentPage); // reopen at the same page
-                            return;
-                        }
-
-                        Component title = render(translatable("gui.language.search"), locale);
-                        Component label = render(translatable("ui.search.label", this.searchFilter), locale);
-                        new TextInputDialog(player, title, label, s -> {
-                            this.searchFilter = s;
-                            open(player); // reopen at page 1
-                        }).open();
-                    });
-        }
+        addSearchItemStack(registeredInventoryBuilder, player);
+        addSortItemStack(registeredInventoryBuilder, player);
     }
 
     @Override
@@ -137,6 +115,15 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             elementStream = elementStream.filter(e -> ((ISearchable<E>) iSearchable).searchFunction(e, this.searchFilter));
         }
 
+        if (this instanceof ISortable<?> iSortable) {
+            // get comparator
+            Comparator<E> comparator = (Comparator<E>) iSortable.comparators().get(this.sortComparatorId);
+
+            if (comparator != null) {
+                elementStream = elementStream.sorted(comparator);
+            }
+        }
+
         List<E> elements = elementStream.toList();
 
         int from = (this.currentPage - 1) * pageSize;
@@ -158,6 +145,53 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
                             .build(), (clicker, _, _, _) -> open(clicker, this.currentPage + 1));
+        }
+    }
+
+    private void addSearchItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
+        if (this instanceof ISearchable<?> iSearchable) {
+            Locale locale = player.locale();
+
+            ItemStack searchItemStack = Item.builder(SPYGLASS)
+                    .displayName(render(iSearchable.searchItemTitle(), locale))
+                    .lore(iSearchable.searchItemTooltip(this.searchFilter))
+                    .glint(!this.searchFilter.isEmpty())
+                    .build();
+
+            registeredInventoryBuilder
+                    .item(-5, searchItemStack, (_, _, clickType, _) -> {
+                        if (clickType == SHIFT_LEFT) {
+                            this.searchFilter = "";
+                            open(player, this.currentPage); // reopen at the same page
+                            return;
+                        }
+
+                        Component title = render(translatable("gui.language.search"), locale);
+                        Component label = render(translatable("ui.search.label", this.searchFilter), locale);
+                        new TextInputDialog(player, title, label, s -> {
+                            this.searchFilter = s;
+                            open(player); // reopen at page 1
+                        }).open();
+                    });
+        }
+    }
+
+    private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
+        if (this instanceof ISortable<?> iSortable && !this.sortComparatorId.isBlank()) {
+            Locale locale = player.locale();
+
+            ItemStack sortItemStack = Item.builder(SPYGLASS)
+                    .displayName(render(iSortable.sortItemTitle(), locale))
+                    .lore(iSortable.sortItemTooltip(this.sortComparatorId))
+                    .build();
+
+            registeredInventoryBuilder
+                    .item(-3, sortItemStack, (_, _, _, _) -> {
+                        List<String> keys = new ArrayList<>(iSortable.comparators().keySet());
+                        int nextIndex = (keys.indexOf(this.sortComparatorId) + 1) % keys.size();
+                        this.sortComparatorId = keys.get(nextIndex);
+                        open(player, this.currentPage);
+                    });
         }
     }
 }

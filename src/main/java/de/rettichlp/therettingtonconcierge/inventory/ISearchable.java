@@ -9,7 +9,7 @@ public interface ISearchable<E> {
 
     Component searchItemTitle();
 
-    List<Component> searchItemTooltip(@NonNull String currentSearchString);
+    List<Component> searchItemTooltip(@NonNull String searchString);
 
-    boolean searchFunction(@NonNull E element, @NonNull String searchFilter);
+    boolean searchFunction(@NonNull E element, @NonNull String searchString);
 }

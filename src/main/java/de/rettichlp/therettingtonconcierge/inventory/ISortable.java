@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface ISortable<E> {
 
-    Component sortItemTitle();
+    Component sortItemName();
 
     List<Component> sortItemTooltip(@NonNull String sortString);
 

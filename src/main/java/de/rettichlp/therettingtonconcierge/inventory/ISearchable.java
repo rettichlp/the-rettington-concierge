@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ISearchable<E> {
 
-    Component searchItemTitle();
+    Component searchItemName();
 
     List<Component> searchItemTooltip(@NonNull String searchString);
 

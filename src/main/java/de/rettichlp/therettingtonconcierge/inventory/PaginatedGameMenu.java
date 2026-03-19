@@ -23,6 +23,7 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
 import static net.kyori.adventure.translation.GlobalTranslator.render;
+import static org.bukkit.Material.BAMBOO_SHELF;
 import static org.bukkit.Material.PAPER;
 import static org.bukkit.Material.SPYGLASS;
 import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
@@ -154,7 +155,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             Locale locale = player.locale();
 
             ItemStack searchItemStack = Item.builder(SPYGLASS)
-                    .displayName(render(iSearchable.searchItemTitle(), locale))
+                    .displayName(iSearchable.searchItemName())
                     .lore(iSearchable.searchItemTooltip(this.searchFilter))
                     .glint(!this.searchFilter.isEmpty())
                     .build();
@@ -178,10 +179,8 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
         if (this instanceof ISortable<?> iSortable) {
-            Locale locale = player.locale();
-
-            ItemStack sortItemStack = Item.builder(SPYGLASS)
-                    .displayName(render(iSortable.sortItemTitle(), locale))
+            ItemStack sortItemStack = Item.builder(BAMBOO_SHELF)
+                    .displayName(iSortable.sortItemName())
                     .lore(iSortable.sortItemTooltip(this.sortComparatorId))
                     .build();
 

@@ -111,11 +111,11 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
         Stream<E> elementStream = stream(elements(player));
 
-        if (this instanceof ISearchable<?> iSearchable) {
+        if (this instanceof ISearchable<?> iSearchable && !this.searchFilter.isBlank()) {
             elementStream = elementStream.filter(e -> ((ISearchable<E>) iSearchable).searchFunction(e, this.searchFilter));
         }
 
-        if (this instanceof ISortable<?> iSortable) {
+        if (this instanceof ISortable<?> iSortable && !this.sortComparatorId.isBlank()) {
             // get comparator
             Comparator<E> comparator = (Comparator<E>) iSortable.comparators().get(this.sortComparatorId);
 
@@ -177,7 +177,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
     }
 
     private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
-        if (this instanceof ISortable<?> iSortable && !this.sortComparatorId.isBlank()) {
+        if (this instanceof ISortable<?> iSortable) {
             Locale locale = player.locale();
 
             ItemStack sortItemStack = Item.builder(SPYGLASS)

@@ -167,7 +167,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             ItemStack sortItemStack = Item.builder(HOPPER)
                     .displayName(iFilterable.filterItemName())
                     .lore(iFilterable.filterItemTooltip(this.filter))
-                    .glint(!this.search.isEmpty())
+                    .glint(!this.filter.isEmpty())
                     .build();
 
             registeredInventoryBuilder
@@ -233,9 +233,14 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         }
     }
 
-    private <T> T nextMapKey(@NonNull Map<T, ?> map, T currentKey) {
-        List<T> keys = new ArrayList<>(map.keySet());
-        int nextIndex = (keys.indexOf(currentKey) + 1) % keys.size();
-        return keys.get(nextIndex);
+    private String nextMapKey(@NonNull Map<String, ?> map, @NonNull String currentKey) {
+        List<String> keys = new ArrayList<>(map.keySet());
+
+        if (currentKey.isEmpty()) {
+            return keys.getFirst();
+        }
+
+        int nextIndex = keys.indexOf(currentKey) + 1;
+        return nextIndex >= keys.size() ? "" : keys.get(nextIndex);
     }
 }

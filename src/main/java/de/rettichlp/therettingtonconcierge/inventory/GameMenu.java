@@ -6,41 +6,41 @@ import org.jspecify.annotations.NonNull;
 
 public abstract class GameMenu {
 
+    protected final Player player;
+
+    public GameMenu(Player player) {
+        this.player = player;
+    }
+
     /**
-     * Retrieves the title component of the game menu, which is used as the display title when opening the inventory.
+     * Retrieves the title of the game menu. The title is typically used as the display name of the menu when it is opened for a
+     * player.
      *
-     * @return the title component of the game menu
+     * @return a {@link Component} object representing the title of the game menu
      */
     public abstract Component title();
 
     /**
-     * Retrieves the pattern used for configuring the registered inventory in the game menu.
+     * Retrieves the size of the game menu. The size determines the number of inventory slots available in the menu.
      *
-     * @return the pattern instance used for structuring and organizing the registered inventory
+     * @return an integer representing the size of the game menu
      */
     public abstract int size();
 
     /**
-     * Constructs and configures the inventory for the game menu based on the specified player, registered inventory builder, and page
-     * number. This method allows customization of the inventory's contents and behavior.
+     * Configures and builds the registered inventory menu for the player, based on the provided arguments.
      *
-     * @param player                     the player for whom the inventory is being built
-     * @param registeredInventoryBuilder the builder instance for configuring the registered inventory
-     * @param page                       the current page number to be displayed in the inventory
-     * @param tabIndex                   the index of the tab being built, if applicable
+     * @param registeredInventoryBuilder the builder instance used to create the registered inventory menu
+     * @param page                       the current page number of the menu being built
+     * @param tabIndex                   the index of the current active tab in the menu
      */
-    public abstract void builder(Player player,
-                                 RegisteredInventory.@NonNull Builder registeredInventoryBuilder,
-                                 int page,
-                                 int tabIndex);
+    public abstract void builder(RegisteredInventory.@NonNull Builder registeredInventoryBuilder, int page, int tabIndex);
 
     /**
-     * Opens the game menu for the specified player, constructing and configuring the inventory using provided title, pattern, and
-     * optional behaviors.
-     *
-     * @param player the player for whom the game menu is opened
+     * Opens the game menu for the associated player. This method initializes a {@link RegisteredInventory.Builder} with the menu's
+     * title and size, and further configures it to include additional features based on the context of the {@code GameMenu} instance.
      */
-    public void open(Player player) {
+    public void open() {
         RegisteredInventory.Builder registeredInventoryBuilder = RegisteredInventory.getBuilder()
                 .title(title())
                 .size(size());
@@ -49,12 +49,12 @@ public abstract class GameMenu {
             registeredInventoryBuilder.openSound(iOpenSound.openSound());
         }
 
-        builder(player, registeredInventoryBuilder, 1, 0);
+        builder(registeredInventoryBuilder, 1, 0);
 
         if (this instanceof IOverwrite iOverwrite) {
             iOverwrite.overwrite(registeredInventoryBuilder);
         }
 
-        registeredInventoryBuilder.openInventory(player);
+        registeredInventoryBuilder.openInventory(this.player);
     }
 }

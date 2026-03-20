@@ -53,7 +53,7 @@ dependencies {
     implementation("org.springframework.data", "spring-data-mongodb", "5.0.4")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.21.1")
+    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.21.2")
 
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }

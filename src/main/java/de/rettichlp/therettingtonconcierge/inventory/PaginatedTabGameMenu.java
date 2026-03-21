@@ -20,8 +20,12 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
     private int currentPage = 0;
     private int currentTabIndex = 0;
 
+    public PaginatedTabGameMenu(Player player) {
+        super(player);
+    }
+
     @Override
-    public void builder(Player player, RegisteredInventory.@NonNull Builder registeredInventoryBuilder, int page, int tabIndex) {
+    public void builder(RegisteredInventory.@NonNull Builder registeredInventoryBuilder, int page, int tabIndex) {
         this.currentPage = page;
         this.currentTabIndex = tabIndex;
 
@@ -29,17 +33,17 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
         addTabIcons(registeredInventoryBuilder);
 
         // add elements for the current tab
-        for (E element : getPageElements(player)) {
+        for (E element : getPageElements()) {
             registeredInventoryBuilder
-                    .add(itemStack(player, element), (clicker, _, clickType, _) -> clickFunction(clicker, clickType, element));
+                    .add(itemStack(element), (clicker, _, clickType, _) -> clickFunction(clickType, element));
         }
 
-        addPageControl(registeredInventoryBuilder, player);
+        addPageControl(registeredInventoryBuilder);
     }
 
     @Override
-    public void open(Player player) {
-        open(player, 1, 0);
+    public void open() {
+        open(1, 0);
     }
 
     /**
@@ -51,41 +55,41 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
      * @param page     the page number of the menu to display
      * @param tabIndex the tab index number of the menu to display
      */
-    public void open(Player player, int page, int tabIndex) {
+    public void open(int page, int tabIndex) {
         RegisteredInventory.Builder registeredInventoryBuilder = RegisteredInventory.getBuilder()
                 .title(title())
                 .size(size());
 
-        builder(player, registeredInventoryBuilder, page, tabIndex);
+        builder(registeredInventoryBuilder, page, tabIndex);
 
         if (this instanceof IOverwrite iOverwrite) {
             iOverwrite.overwrite(registeredInventoryBuilder);
         }
 
-        registeredInventoryBuilder.openInventory(player);
+        registeredInventoryBuilder.openInventory(this.player);
     }
 
-    private @NonNull @Unmodifiable List<E> getPageElements(Player player) {
+    private @NonNull @Unmodifiable List<E> getPageElements() {
         int pageSize = size() - 18; // the first row is reserved for tab control; the last row is reserved for page control
-        E[] elements = elements(player, this.currentTabIndex);
+        E[] elements = elements(this.currentTabIndex);
         E[] pageElements = copyOfRange(elements, (this.currentPage - 1) * pageSize, min(elements.length, this.currentPage * pageSize));
         return List.of(pageElements);
     }
 
-    private void addPageControl(RegisteredInventory.Builder registeredInventoryBuilder, Player player) {
+    private void addPageControl(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this.currentPage > 1) {
             registeredInventoryBuilder
                     .item(-6, Item.builder(PAPER)
                             .displayName(text("«", DARK_GRAY))
-                            .build(), (clicker, _, _, _) -> open(clicker, this.currentPage - 1, this.currentTabIndex));
+                            .build(), (clicker, _, _, _) -> open(this.currentPage - 1, this.currentTabIndex));
         }
 
         int pageSize = size() - 18; // the first row is reserved for tab control; the last row is reserved for page control
-        if (elements(player, this.currentTabIndex).length > this.currentPage * pageSize) {
+        if (elements(this.currentTabIndex).length > this.currentPage * pageSize) {
             registeredInventoryBuilder
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
-                            .build(), (clicker, _, _, _) -> open(clicker, this.currentPage + 1, this.currentTabIndex));
+                            .build(), (clicker, _, _, _) -> open(this.currentPage + 1, this.currentTabIndex));
         }
     }
 }

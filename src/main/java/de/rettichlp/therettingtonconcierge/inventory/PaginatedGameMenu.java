@@ -29,6 +29,7 @@ import static org.bukkit.Material.BAMBOO_SHELF;
 import static org.bukkit.Material.HOPPER;
 import static org.bukkit.Material.PAPER;
 import static org.bukkit.Material.SPYGLASS;
+import static org.bukkit.Material.STRUCTURE_VOID;
 import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
 
 @Getter
@@ -90,6 +91,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         }
 
         addPageControl(registeredInventoryBuilder);
+        addPreviousMenuItemStack(registeredInventoryBuilder);
         addFilterItemStack(registeredInventoryBuilder);
         addSearchItemStack(registeredInventoryBuilder);
         addSortItemStack(registeredInventoryBuilder);
@@ -203,6 +205,19 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
                             .build(), (_, _, _, _) -> open(this.currentPage + 1));
+        }
+    }
+
+    private void addPreviousMenuItemStack(RegisteredInventory.Builder registeredInventoryBuilder) {
+        if (this instanceof IPreviousMenu iPreviousMenu) {
+            ItemStack previouMenuItemStack = Item.builder(STRUCTURE_VOID)
+                    .displayName(iPreviousMenu.previousMenuItemName())
+                    .lore(iPreviousMenu.previousMenuItemTooltip())
+                    .customModelData("gui.back")
+                    .build();
+
+            registeredInventoryBuilder
+                    .item(-9, previouMenuItemStack, (_, _, _, _) -> iPreviousMenu.previousMenu().open());
         }
     }
 

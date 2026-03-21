@@ -31,7 +31,7 @@ import static org.bukkit.Material.STRUCTURE_VOID;
 import static org.bukkit.event.EventPriority.HIGH;
 import static org.bukkit.event.EventPriority.HIGHEST;
 
-@RequiredArgsConstructor(onConstructor = @__({ @Inject }))
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class InventoryListener implements Listener {
 
     private static final Map<Player, Long> SPAM_PREVENTION = new HashMap<>();

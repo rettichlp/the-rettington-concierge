@@ -17,7 +17,7 @@ plugins {
     `maven-publish`
 
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
-    id("com.gradleup.shadow") version "9.3.2"
+    id("com.gradleup.shadow") version "9.4.0"
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
@@ -37,8 +37,8 @@ dependencies {
     annotationProcessor("org.atteo.classindex", "classindex", "3.13")
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly("org.projectlombok", "lombok", "1.18.42")
-    annotationProcessor("org.projectlombok", "lombok", "1.18.42")
+    compileOnly("org.projectlombok", "lombok", "1.18.44")
+    annotationProcessor("org.projectlombok", "lombok", "1.18.44")
 
     // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject", "guice", "7.0.0")
@@ -47,13 +47,13 @@ dependencies {
     implementation("com.google.code.gson", "gson", "2.13.2")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
-    implementation("org.springframework", "spring-webflux", "7.0.5")
+    implementation("org.springframework", "spring-webflux", "7.0.6")
 
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb
-    implementation("org.springframework.data", "spring-data-mongodb", "5.0.3")
+    implementation("org.springframework.data", "spring-data-mongodb", "5.0.4")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.21.1")
+    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.21.2")
 
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }

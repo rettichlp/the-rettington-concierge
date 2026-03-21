@@ -25,9 +25,9 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
 import static net.kyori.adventure.translation.GlobalTranslator.render;
-import static org.bukkit.Material.BAMBOO_SHELF;
 import static org.bukkit.Material.HOPPER;
 import static org.bukkit.Material.PAPER;
+import static org.bukkit.Material.PLAYER_HEAD;
 import static org.bukkit.Material.SPYGLASS;
 import static org.bukkit.Material.STRUCTURE_VOID;
 import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
@@ -292,9 +292,10 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
      */
     private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this instanceof ISortable<?> iSortable) {
-            ItemStack sortItemStack = Item.builder(BAMBOO_SHELF)
+            ItemStack sortItemStack = Item.builder(PLAYER_HEAD)
                     .displayName(iSortable.sortItemName())
                     .lore(iSortable.sortItemTooltip(this.sort))
+                    .skullTexture("f5a19af0e61ca42532c0599fa0a391753df6b71f9fa4a177f1aa9b1d81fe6ee2")
                     .glint(!this.sort.isEmpty())
                     .build();
 

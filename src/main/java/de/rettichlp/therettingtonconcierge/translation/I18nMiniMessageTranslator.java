@@ -33,6 +33,9 @@ import static net.kyori.adventure.translation.TranslationStore.messageFormat;
 @Getter
 public class I18nMiniMessageTranslator extends MiniMessageTranslator {
 
+    @Getter
+    private static I18nMiniMessageTranslator instance;
+
     private final JavaPlugin plugin;
     private final LogDispatcher logDispatcher;
     private final String namespace;
@@ -44,6 +47,7 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
         this.logDispatcher = logDispatcher;
         this.namespace = plugin.namespace();
         this.translationStore = messageFormat(key(this.namespace + ":i18n"));
+        instance = this;
 
         // add this translator to the GlobalTranslator
         translator().addSource(this);
@@ -64,7 +68,14 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
         }
     }
 
-    public @NonNull Component localize(@NonNull String translationKey, @NonNull Locale locale, Object @NonNull ... args) {
+    @Override
+    protected @Nullable String getMiniMessageString(@NotNull String key, @NotNull Locale locale) {
+        return ofNullable(this.translationStore.translate(key, locale))
+                .map(MessageFormat::toPattern)
+                .orElse(null); // Returning null "ignores" this translation.
+    }
+
+    private @NonNull Component localizeInstance(@NonNull String translationKey, @NonNull Locale locale, Object @NonNull ... args) {
         // map arguments to components
         List<@NotNull Component> argComponents = stream(args).map(TextUtils::objectToComponent).toList();
 
@@ -89,9 +100,9 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
         return builder.deserialize(rawString);
     }
 
-    public @NonNull List<Component> localizeMultiline(@NonNull String translationKey,
-                                                      @NonNull Locale locale,
-                                                      Object @NonNull ... args) {
+    private @NonNull List<Component> localizeMultilineInstance(@NonNull String translationKey,
+                                                               @NonNull Locale locale,
+                                                               Object @NonNull ... args) {
         // map arguments to components
         List<@NotNull Component> argComponents = stream(args).map(TextUtils::objectToComponent).toList();
 
@@ -116,16 +127,19 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
         return stream(rawString.split("\n")).map(builder::deserialize).toList();
     }
 
-    @Override
-    protected @Nullable String getMiniMessageString(@NotNull String key, @NotNull Locale locale) {
-        return ofNullable(this.translationStore.translate(key, locale))
-                .map(MessageFormat::toPattern)
-                .orElse(null); // Returning null "ignores" this translation.
-    }
-
     private void loadTranslationFile(Locale locale) {
         ResourceBundle bundle = getBundle(this.namespace, locale);
         this.translationStore.registerAll(locale, bundle, false);
         this.logDispatcher.debug(getClass(), "Registered bundle {} for locale {}", this.namespace, locale);
+    }
+
+    public static @NonNull Component localize(@NonNull String translationKey, @NonNull Locale locale, Object @NonNull ... args) {
+        return instance.localizeInstance(translationKey, locale, args);
+    }
+
+    public static @NonNull List<Component> localizeMultiline(@NonNull String translationKey,
+                                                             @NonNull Locale locale,
+                                                             Object @NonNull ... args) {
+        return instance.localizeMultilineInstance(translationKey, locale, args);
     }
 }

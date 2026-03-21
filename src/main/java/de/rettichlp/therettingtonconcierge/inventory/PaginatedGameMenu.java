@@ -13,10 +13,13 @@ import org.jspecify.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static de.rettichlp.therettingtonconcierge.translation.I18nMiniMessageTranslator.localize;
+import static de.rettichlp.therettingtonconcierge.translation.I18nMiniMessageTranslator.localizeMultiline;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static java.util.Arrays.stream;
@@ -210,9 +213,10 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private void addPreviousMenuItemStack(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this instanceof IPreviousMenu iPreviousMenu) {
+            Locale locale = this.player.locale();
             ItemStack previouMenuItemStack = Item.builder(STRUCTURE_VOID)
-                    .displayName(iPreviousMenu.previousMenuItemName())
-                    .lore(iPreviousMenu.previousMenuItemTooltip())
+                    .displayName(localize("gui.back.name", locale))
+                    .lore(localizeMultiline("gui.back.tooltip", locale))
                     .customModelData("gui.back")
                     .build();
 
@@ -231,9 +235,10 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
      */
     private void addFilterItemStack(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this instanceof IFilterable<?> iFilterable) {
+            Locale locale = this.player.locale();
             ItemStack sortItemStack = Item.builder(HOPPER)
-                    .displayName(iFilterable.filterItemName())
-                    .lore(iFilterable.filterItemTooltip(this.filter))
+                    .displayName(localize("gui.filter.name", locale))
+                    .lore(localizeMultiline("gui.filter.tooltip", locale, this.filter.isEmpty() ? "-" : localize("gui.filter.type." + this.filter, locale)))
                     .glint(!this.filter.isEmpty())
                     .build();
 
@@ -260,9 +265,10 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
      */
     private void addSearchItemStack(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this instanceof ISearchable<?> iSearchable) {
+            Locale locale = this.player.locale();
             ItemStack searchItemStack = Item.builder(SPYGLASS)
-                    .displayName(iSearchable.searchItemName())
-                    .lore(iSearchable.searchItemTooltip(this.search))
+                    .displayName(localize("gui.search.name", locale))
+                    .lore(localizeMultiline("gui.search.tooltip", locale, this.search.isEmpty() ? "-" : this.search))
                     .glint(!this.search.isEmpty())
                     .build();
 
@@ -292,9 +298,10 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
      */
     private void addSortItemStack(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this instanceof ISortable<?> iSortable) {
+            Locale locale = this.player.locale();
             ItemStack sortItemStack = Item.builder(PLAYER_HEAD)
-                    .displayName(iSortable.sortItemName())
-                    .lore(iSortable.sortItemTooltip(this.sort))
+                    .displayName(localize("gui.sort.name", locale))
+                    .lore(localizeMultiline("gui.sort.tooltip", locale, this.sort.isEmpty() ? "-" : localize("gui.sort.type." + this.sort, locale)))
                     .skullTexture("f5a19af0e61ca42532c0599fa0a391753df6b71f9fa4a177f1aa9b1d81fe6ee2")
                     .glint(!this.sort.isEmpty())
                     .build();

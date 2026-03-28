@@ -5,7 +5,6 @@ import de.rettichlp.therettingtonconcierge.listener.InventoryListener;
 import de.rettichlp.therettingtonconcierge.listener.TRCEventListener;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
-import de.rettichlp.therettingtonconcierge.registry.Ignore;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bukkit.event.Listener;
@@ -14,16 +13,15 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
 @Singleton
-public final class ListenerRegistry extends AbstractRegistry {
+public final class ListenerRegistry extends AbstractRegistry<Listener> {
 
     @Inject
     public ListenerRegistry(@NonNull JavaPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
-        super(plugin, injector, logDispatcher, "listener");
+        super(plugin, injector, logDispatcher, Listener.class, "listener");
 
         // register all the listener from this project
         getPluginManager().registerEvents(injector.getInstance(InventoryListener.class), this.plugin);
@@ -31,20 +29,14 @@ public final class ListenerRegistry extends AbstractRegistry {
     }
 
     @Override
-    public @NonNull @Unmodifiable List<Class<?>> getClasses() {
-        return this.classes.stream()
+    public @NonNull @Unmodifiable List<Class<Listener>> classes() {
+        return getAllClasses().stream()
                 .filter(Listener.class::isAssignableFrom)
                 .toList();
     }
 
     @Override
-    public void register(Class<?> clazz) {
-        Listener instance = (Listener) this.injector.getInstance(clazz);
+    public void register(Class<Listener> clazz, Listener instance) {
         getPluginManager().registerEvents(instance, this.plugin);
-    }
-
-    @Override
-    public Predicate<Class<?>> skip() {
-        return clazz -> clazz.isAnnotationPresent(Ignore.class);
     }
 }

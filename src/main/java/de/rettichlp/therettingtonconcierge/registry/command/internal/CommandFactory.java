@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static io.papermc.paper.command.brigadier.Commands.literal;
 import static java.util.Optional.ofNullable;
 
 @ApiStatus.Internal
@@ -33,11 +34,7 @@ public final class CommandFactory {
 
         final String label = command.label();
         final String[] aliases = command.aliases();
-        final LiteralArgumentBuilder<CommandSourceStack> literal = Commands.literal(label)
-                .requires(commandSourceStack -> {
-                    // check if the command is disabled
-                    return !command.disabled();
-                });
+        final LiteralArgumentBuilder<CommandSourceStack> literal = literal(label);
 
         registrar.register(this.internalCommand.node(literal).build(), newArrayList(aliases));
         return command;

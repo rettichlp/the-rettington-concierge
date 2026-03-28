@@ -35,12 +35,4 @@ public @interface Command {
      * @return an array of {@link String} representing the command's aliases. Defaults to an empty array if no aliases are specified.
      */
     String[] aliases() default {};
-
-    /**
-     * Indicates whether the annotated command is disabled. When set to true, the command will not be registered or available for use
-     * within the system.
-     *
-     * @return {@code true} if the command is disabled, otherwise {@code false}.
-     */
-    boolean disabled() default false;
 }

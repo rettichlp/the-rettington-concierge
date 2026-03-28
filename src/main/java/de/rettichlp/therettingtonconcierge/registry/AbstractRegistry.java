@@ -62,6 +62,7 @@ public abstract class AbstractRegistry<T> {
             try {
                 T instance = this.injector.getInstance(clazz);
                 register(clazz, instance);
+                this.instances.add(instance);
                 registered++;
             } catch (Exception e) {
                 this.logDispatcher.warn("Failed to register {} {}: {}", this.registryName, clazz.getSimpleName(), e.getMessage());

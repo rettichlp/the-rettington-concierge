@@ -8,9 +8,11 @@ import org.jspecify.annotations.NonNull;
 public interface ILocation {
 
     /**
-     * Retrieves the {@link Location} associated with the current object.
+     * Retrieves a {@link Location} object representing the specific location in the given world.
      *
-     * @return A non-null {@code Location} instance representing the object's location.
+     * @param world the world for which the location is retrieved; must not be null
+     *
+     * @return a non-null {@link Location} object corresponding to the specified world
      */
     @NonNull Location getLocation(World world);
 

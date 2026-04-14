@@ -3,14 +3,22 @@ package de.rettichlp.therettingtonconcierge.utils.location;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+import static java.lang.Double.POSITIVE_INFINITY;
 import static java.util.Comparator.comparingDouble;
+import static java.util.Map.Entry.comparingByValue;
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @AllArgsConstructor
@@ -44,19 +52,68 @@ public class LocationUtils {
     }
 
     /**
-     * Finds and returns the nearest element to the given reference location from the provided collection of elements. The distance is
-     * calculated based on the squared distance between the location of each element and the reference location.
+     * Finds the nearest element from a given iterable of elements that implement the {@link ILocation} interface, based on the squared
+     * distance to the specified location.
      *
-     * @param referenceLocation the reference {@link Location} to which the distance is measured.
-     * @param elements          a non-null collection of elements implementing {@link ILocation}, each providing its own location. The
-     *                          collection can be empty.
-     * @param <T>               the type of elements in the collection, which must extend {@link ILocation}.
+     * @param location the reference location used to calculate distances; must not be null
+     * @param elements the iterable collection of elements to search through; must not be null
+     * @param <T>      the type of elements in the iterable, which must extend {@link ILocation}
      *
-     * @return the nearest element of type {@code T} to the specified reference location, or {@code null} if the collection is empty.
+     * @return the nearest element from the iterable based on squared distance to the location, or {@code null} if the iterable is
+     *         empty
      */
-    public static @Nullable <T extends ILocation> T getNearest(Location referenceLocation, @NonNull Collection<T> elements) {
+    public static <T extends ILocation> @Nullable T getNearest(@NonNull Location location, @NonNull Iterable<T> elements) {
+        World world = location.getWorld();
+        double maxDistance = POSITIVE_INFINITY;
+        T nearest = null;
+
+        for (T element : elements) {
+            double distance = location.distanceSquared(element.getLocation(world));
+            if (distance < maxDistance) {
+                maxDistance = distance;
+                nearest = element;
+            }
+        }
+
+        return nearest;
+    }
+
+    /**
+     * Sorts a collection of elements that implement the {@link ILocation} interface in ascending order based on their squared distance
+     * to a specified location.
+     *
+     * @param location the reference location used to calculate distances; must not be null
+     * @param elements the collection of elements to sort; must not be null
+     * @param <T>      the type of elements in the collection, which must extend {@link ILocation}
+     *
+     * @return a sorted list of elements in ascending order of their squared distance to the given location
+     */
+    public static <T extends ILocation> @Unmodifiable @NonNull List<T> sort(@NonNull Location location,
+                                                                            @NonNull Collection<T> elements) {
+        World world = location.getWorld();
         return elements.stream()
-                .min(comparingDouble(element -> element.getLocation().distanceSquared(referenceLocation)))
-                .orElse(null);
+                .sorted(comparingDouble(t -> location.distanceSquared(t.getLocation(world))))
+                .toList();
+    }
+
+    /**
+     * Sorts a collection of elements that implement the {@link ILocation} interface in ascending order based on their distance to a
+     * specified location, and returns a {@link LinkedHashMap} where the keys are the elements and the values are their respective
+     * distances.
+     *
+     * @param location the reference location used to calculate distances; must not be null
+     * @param elements the collection of elements to sort, which must implement {@link ILocation}; must not be null
+     * @param <T>      the type of elements in the collection, which must extend {@link ILocation}
+     *
+     * @return a {@link LinkedHashMap} of the elements sorted in ascending order of their distance to the given location, with the keys
+     *         being the elements and the values being their distances
+     */
+    public static <T extends ILocation> LinkedHashMap<T, Double> sortWithDistance(@NonNull Location location,
+                                                                                  @NonNull Collection<T> elements) {
+        World world = location.getWorld();
+        return elements.stream()
+                .collect(toMap(t -> t, t -> location.distance(t.getLocation(world)))).entrySet().stream()
+                .sorted(comparingByValue())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
     }
 }

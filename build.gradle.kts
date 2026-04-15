@@ -32,6 +32,9 @@ dependencies {
     api("io.papermc.paper", "paper-api", "1.21.11-R0.1-SNAPSHOT")
     api("net.kyori", "adventure-text-serializer-ansi", "5.0.1")
 
+    api("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
+
     // https://mvnrepository.com/artifact/org.atteo.classindex/classindex
     api("org.atteo.classindex", "classindex", "3.13")
     annotationProcessor("org.atteo.classindex", "classindex", "3.13")

@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
     api("io.papermc.paper", "paper-api", "1.21.11-R0.1-SNAPSHOT")
-    api("net.kyori", "adventure-text-serializer-ansi", "4.26.1")
+    api("net.kyori", "adventure-text-serializer-ansi", "5.0.1")
 
     // https://mvnrepository.com/artifact/org.atteo.classindex/classindex
     api("org.atteo.classindex", "classindex", "3.13")

@@ -25,12 +25,7 @@ public class PaperCommandRegistry extends AbstractCommandRegistry<CommandSourceS
     @Inject
     public PaperCommandRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
         super(plugin, injector, logDispatcher);
-
-        if (!(this.plugin instanceof JavaPlugin javaPlugin)) {
-            throw new IllegalStateException("Interface " + IMinecraftPlugin.class.getSimpleName() + " must be implemented by a class that also implements " + JavaPlugin.class.getSimpleName());
-        }
-
-        this.javaPlugin = javaPlugin;
+        this.javaPlugin = plugin.getPaperPlugin();
     }
 
     @Override

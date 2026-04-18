@@ -25,12 +25,7 @@ public final class ListenerRegistry extends AbstractRegistry<Listener> {
     @Inject
     public ListenerRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
         super(plugin, injector, logDispatcher, Listener.class, "listener");
-
-        if (!(this.plugin instanceof JavaPlugin javaPlugin)) {
-            throw new IllegalStateException("Interface " + IMinecraftPlugin.class.getSimpleName() + " must be implemented by a class that also implements " + JavaPlugin.class.getSimpleName());
-        }
-
-        this.javaPlugin = javaPlugin;
+        this.javaPlugin = plugin.getPaperPlugin();
 
         // register all the listener from this project
         getPluginManager().registerEvents(injector.getInstance(InventoryListener.class), this.javaPlugin);

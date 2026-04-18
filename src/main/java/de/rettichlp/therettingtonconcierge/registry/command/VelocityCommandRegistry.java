@@ -32,19 +32,19 @@ public class VelocityCommandRegistry extends AbstractCommandRegistry<CommandSour
     }
 
     @Override
-    public void registerTypeSpecific(@NonNull ICommand<CommandSource> instance, String label, String[] aliases) {
+    public void registerTypeSpecific(@NonNull ICommand<CommandSource> instance, @NonNull Command command) {
         if (!this.plugin.getClass().isAnnotationPresent(Plugin.class)) {
             throw new IllegalStateException("Interface " + IMinecraftPlugin.class.getSimpleName() + " must be implemented by a class that is annotated by " + Plugin.class.getName());
         }
 
         CommandManager manager = this.proxyServer.getCommandManager();
 
-        LiteralArgumentBuilder<CommandSource> labelLiteral = literalArgumentBuilder(label);
+        LiteralArgumentBuilder<CommandSource> labelLiteral = literalArgumentBuilder(command.label());
         LiteralCommandNode<CommandSource> commandNode = instance.node(labelLiteral).build();
 
         // create command meta
-        CommandMeta commandMeta = manager.metaBuilder(label)
-                .aliases(aliases)
+        CommandMeta commandMeta = manager.metaBuilder(command.label())
+                .aliases(command.aliases())
                 .plugin(this.plugin)
                 .build();
 

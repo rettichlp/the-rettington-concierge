@@ -18,7 +18,7 @@ public abstract class AbstractCommandRegistry<T> extends AbstractRegistry<IComma
         super(plugin, injector, logDispatcher, (Class<ICommand<T>>) (Class<?>) ICommand.class, "command");
     }
 
-    public abstract void registerTypeSpecific(@NonNull ICommand<T> instance, String label, String[] aliases);
+    public abstract void registerTypeSpecific(@NonNull ICommand<T> instance, @NonNull Command command);
 
     @Override
     public @NonNull @Unmodifiable List<Class<ICommand<T>>> classes() {
@@ -32,9 +32,6 @@ public abstract class AbstractCommandRegistry<T> extends AbstractRegistry<IComma
         Command command = ofNullable(clazz.getAnnotation(Command.class))
                 .orElseThrow(() -> new RuntimeException("Failed to create instance for command " + clazz.getSimpleName() + ": No " + Command.class.getSimpleName() + " annotation found"));
 
-        String label = command.label();
-        String[] aliases = command.aliases();
-
-        registerTypeSpecific(instance, label, aliases);
+        registerTypeSpecific(instance, command);
     }
 }

@@ -34,13 +34,13 @@ public class PaperCommandRegistry extends AbstractCommandRegistry<CommandSourceS
     }
 
     @Override
-    public void registerTypeSpecific(@NonNull ICommand<CommandSourceStack> instance, String label, String[] aliases) {
+    public void registerTypeSpecific(@NonNull ICommand<CommandSourceStack> instance, @NonNull Command command) {
         LifecycleEventManager<Plugin> manager = this.javaPlugin.getLifecycleManager();
 
-        LiteralArgumentBuilder<CommandSourceStack> labelLiteral = literal(label);
+        LiteralArgumentBuilder<CommandSourceStack> labelLiteral = literal(command.label());
         LiteralCommandNode<CommandSourceStack> commandNode = instance.node(labelLiteral).build();
 
         // register command
-        manager.registerEventHandler(COMMANDS, event -> event.registrar().register(commandNode, newArrayList(aliases)));
+        manager.registerEventHandler(COMMANDS, event -> event.registrar().register(commandNode, newArrayList(command.aliases())));
     }
 }

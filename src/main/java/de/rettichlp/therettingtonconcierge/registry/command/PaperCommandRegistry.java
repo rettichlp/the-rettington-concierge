@@ -3,7 +3,7 @@ package de.rettichlp.therettingtonconcierge.registry.command;
 import com.google.inject.Injector;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import de.rettichlp.therettingtonconcierge.classloader.ProtectedClassLoaderAccessor;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
@@ -20,20 +20,22 @@ import static io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMM
 @Singleton
 public class PaperCommandRegistry extends AbstractCommandRegistry<CommandSourceStack> {
 
-    private final JavaPlugin plugin;
+    private final JavaPlugin javaPlugin;
 
     @Inject
-    public PaperCommandRegistry(ProtectedClassLoaderAccessor protectedClassLoaderAccessor,
-                                @NonNull Injector injector,
-                                LogDispatcher logDispatcher,
-                                @NonNull JavaPlugin plugin) {
-        super(protectedClassLoaderAccessor, injector, logDispatcher);
-        this.plugin = plugin;
+    public PaperCommandRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
+        super(plugin, injector, logDispatcher);
+
+        if (!(this.plugin instanceof JavaPlugin javaPlugin)) {
+            throw new IllegalStateException("Interface " + IMinecraftPlugin.class.getSimpleName() + " must be implemented by a class that also implements " + JavaPlugin.class.getSimpleName());
+        }
+
+        this.javaPlugin = javaPlugin;
     }
 
     @Override
     public void registerTypeSpecific(@NonNull ICommand<CommandSourceStack> instance, String label, String[] aliases) {
-        LifecycleEventManager<Plugin> manager = this.plugin.getLifecycleManager();
+        LifecycleEventManager<Plugin> manager = this.javaPlugin.getLifecycleManager();
 
         LiteralArgumentBuilder<CommandSourceStack> labelLiteral = literal(label);
         LiteralCommandNode<CommandSourceStack> commandNode = instance.node(labelLiteral).build();

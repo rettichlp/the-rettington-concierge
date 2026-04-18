@@ -1,7 +1,7 @@
 package de.rettichlp.therettingtonconcierge.registry.command;
 
 import com.google.inject.Injector;
-import de.rettichlp.therettingtonconcierge.classloader.ProtectedClassLoaderAccessor;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
 import org.jetbrains.annotations.Unmodifiable;
@@ -13,10 +13,9 @@ import static java.util.Optional.ofNullable;
 
 public abstract class AbstractCommandRegistry<T> extends AbstractRegistry<ICommand<T>> {
 
-    public AbstractCommandRegistry(ProtectedClassLoaderAccessor protectedClassLoaderAccessor,
-                                   @NonNull Injector injector,
-                                   LogDispatcher logDispatcher) {
-        super(protectedClassLoaderAccessor, injector, logDispatcher, (Class<ICommand<T>>) (Class<?>) ICommand.class, "command");
+    @SuppressWarnings("unchecked")
+    public AbstractCommandRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
+        super(plugin, injector, logDispatcher, (Class<ICommand<T>>) (Class<?>) ICommand.class, "command");
     }
 
     public abstract void registerTypeSpecific(@NonNull ICommand<T> instance, String label, String[] aliases);

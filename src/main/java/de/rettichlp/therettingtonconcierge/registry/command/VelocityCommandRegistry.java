@@ -7,8 +7,9 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.rettichlp.therettingtonconcierge.classloader.ProtectedClassLoaderAccessor;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -19,22 +20,23 @@ import static com.velocitypowered.api.command.BrigadierCommand.literalArgumentBu
 @Singleton
 public class VelocityCommandRegistry extends AbstractCommandRegistry<CommandSource> {
 
-    private final Object plugin;
     private final ProxyServer proxyServer;
 
     @Inject
-    public VelocityCommandRegistry(ProtectedClassLoaderAccessor protectedClassLoaderAccessor,
+    public VelocityCommandRegistry(IMinecraftPlugin plugin,
                                    @NonNull Injector injector,
                                    LogDispatcher logDispatcher,
-                                   @NonNull Object plugin,
                                    ProxyServer proxyServer) {
-        super(protectedClassLoaderAccessor, injector, logDispatcher);
-        this.plugin = plugin;
+        super(plugin, injector, logDispatcher);
         this.proxyServer = proxyServer;
     }
 
     @Override
     public void registerTypeSpecific(@NonNull ICommand<CommandSource> instance, String label, String[] aliases) {
+        if (!this.plugin.getClass().isAnnotationPresent(Plugin.class)) {
+            throw new IllegalStateException("Interface " + IMinecraftPlugin.class.getSimpleName() + " must be implemented by a class that is annotated by " + Plugin.class.getName());
+        }
+
         CommandManager manager = this.proxyServer.getCommandManager();
 
         LiteralArgumentBuilder<CommandSource> labelLiteral = literalArgumentBuilder(label);

@@ -18,12 +18,12 @@ import java.util.List;
 import static org.bukkit.Bukkit.getPluginManager;
 
 @Singleton
-public final class ListenerRegistry extends AbstractRegistry<Listener> {
+public final class PaperListenerRegistry extends AbstractRegistry<Listener> {
 
     private final JavaPlugin javaPlugin;
 
     @Inject
-    public ListenerRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
+    public PaperListenerRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
         super(plugin, injector, logDispatcher, Listener.class, "listener");
         this.javaPlugin = plugin.getPaperPlugin();
 

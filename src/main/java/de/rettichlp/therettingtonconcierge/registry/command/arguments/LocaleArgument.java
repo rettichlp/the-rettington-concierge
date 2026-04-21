@@ -33,6 +33,7 @@ public class LocaleArgument implements CustomArgumentType<Locale, String> {
         this.elements = availableLocales().toList();
     }
 
+    @Override
     public @NonNull Locale parse(@NonNull StringReader stringReader) throws CommandSyntaxException {
         String arg = stringReader.readUnquotedString();
         return this.elements.stream()

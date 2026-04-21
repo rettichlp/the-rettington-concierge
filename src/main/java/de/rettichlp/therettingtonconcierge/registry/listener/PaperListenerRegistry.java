@@ -5,6 +5,7 @@ import de.rettichlp.therettingtonconcierge.listener.InventoryListener;
 import de.rettichlp.therettingtonconcierge.listener.TRCEventListener;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bukkit.event.Listener;
@@ -17,15 +18,18 @@ import java.util.List;
 import static org.bukkit.Bukkit.getPluginManager;
 
 @Singleton
-public final class ListenerRegistry extends AbstractRegistry<Listener> {
+public final class PaperListenerRegistry extends AbstractRegistry<Listener> {
+
+    private final JavaPlugin javaPlugin;
 
     @Inject
-    public ListenerRegistry(@NonNull JavaPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
+    public PaperListenerRegistry(IMinecraftPlugin plugin, @NonNull Injector injector, LogDispatcher logDispatcher) {
         super(plugin, injector, logDispatcher, Listener.class, "listener");
+        this.javaPlugin = plugin.getPaperPlugin();
 
         // register all the listener from this project
-        getPluginManager().registerEvents(injector.getInstance(InventoryListener.class), this.plugin);
-        getPluginManager().registerEvents(injector.getInstance(TRCEventListener.class), this.plugin);
+        getPluginManager().registerEvents(injector.getInstance(InventoryListener.class), this.javaPlugin);
+        getPluginManager().registerEvents(injector.getInstance(TRCEventListener.class), this.javaPlugin);
     }
 
     @Override
@@ -36,7 +40,7 @@ public final class ListenerRegistry extends AbstractRegistry<Listener> {
     }
 
     @Override
-    public void register(Class<Listener> clazz, Listener instance) {
-        getPluginManager().registerEvents(instance, this.plugin);
+    public void register(@NonNull Class<Listener> clazz, Listener instance) {
+        getPluginManager().registerEvents(instance, this.javaPlugin);
     }
 }

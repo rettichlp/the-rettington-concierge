@@ -29,31 +29,34 @@ repositories {
 }
 
 dependencies {
-    api("io.papermc.paper", "paper-api", "1.21.11-R0.1-SNAPSHOT")
-    api("net.kyori", "adventure-text-serializer-ansi", "4.26.1")
+    api("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    api("net.kyori:adventure-text-serializer-ansi:5.0.1")
+
+    api("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
 
     // https://mvnrepository.com/artifact/org.atteo.classindex/classindex
-    api("org.atteo.classindex", "classindex", "3.13")
-    annotationProcessor("org.atteo.classindex", "classindex", "3.13")
+    api("org.atteo.classindex:classindex:3.13")
+    annotationProcessor("org.atteo.classindex:classindex:3.13")
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly("org.projectlombok", "lombok", "1.18.44")
-    annotationProcessor("org.projectlombok", "lombok", "1.18.44")
+    compileOnly("org.projectlombok:lombok:1.18.44")
+    annotationProcessor("org.projectlombok:lombok:1.18.44")
 
     // https://mvnrepository.com/artifact/com.google.inject/guice
-    implementation("com.google.inject", "guice", "7.0.0")
+    implementation("com.google.inject:guice:7.0.0")
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation("com.google.code.gson", "gson", "2.13.2")
+    implementation("com.google.code.gson:gson:2.13.2")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
-    implementation("org.springframework", "spring-webflux", "7.0.6")
+    implementation("org.springframework:spring-webflux:7.0.7")
 
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb
-    implementation("org.springframework.data", "spring-data-mongodb", "5.0.4")
+    implementation("org.springframework.data:spring-data-mongodb:5.0.5")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.21.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2")
 
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }

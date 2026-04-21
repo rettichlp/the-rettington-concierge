@@ -2,6 +2,7 @@ package de.rettichlp.therettingtonconcierge.translation;
 
 import com.google.inject.Inject;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import de.rettichlp.therettingtonconcierge.utils.TextUtils;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
@@ -9,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslator;
 import net.kyori.adventure.translation.TranslationStore;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,15 +39,15 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
 
     private static final Collection<I18nMiniMessageTranslator> INSTANCES = new CopyOnWriteArrayList<>();
 
-    private final JavaPlugin plugin;
+    private final IMinecraftPlugin plugin;
     private final LogDispatcher logDispatcher;
     private final TranslationStore.@NonNull StringBased<MessageFormat> translationStore;
 
     @Inject
-    public I18nMiniMessageTranslator(@NonNull JavaPlugin plugin, LogDispatcher logDispatcher) {
+    public I18nMiniMessageTranslator(@NonNull IMinecraftPlugin plugin, LogDispatcher logDispatcher) {
         this.plugin = plugin;
         this.logDispatcher = logDispatcher;
-        this.translationStore = messageFormat(key(this.plugin.namespace() + ":i18n"));
+        this.translationStore = messageFormat(key(plugin.getPluginInformation().id() + ":i18n"));
 
         // add this translation instance to instance holder for multi-plugin-support
         INSTANCES.add(this);
@@ -80,7 +80,7 @@ public class I18nMiniMessageTranslator extends MiniMessageTranslator {
     private void loadTranslationFile(Locale locale) {
         ResourceBundle bundle = getBundle("lang/" + locale.getLanguage(), locale, this.plugin.getClass().getClassLoader());
         this.translationStore.registerAll(locale, bundle, false);
-        this.logDispatcher.debug(getClass(), "Registered bundle {} for locale {}", this.plugin.namespace(), locale);
+        this.logDispatcher.debug(getClass(), "Registered bundle {} for locale {}", this.plugin.getPluginInformation().id(), locale);
     }
 
     public static @NonNull Component localize(@NonNull String translationKey, @NonNull Locale locale, Object @NonNull ... args) {

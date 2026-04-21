@@ -39,6 +39,7 @@ public class ListArgument<T extends ICommandArgument> implements CustomArgumentT
         this.elements = elements;
     }
 
+    @Override
     public @NonNull T parse(@NonNull StringReader stringReader) throws CommandSyntaxException {
         String arg = stringReader.readUnquotedString();
         return this.elements.stream()

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.ServerOperator;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
@@ -21,9 +22,13 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.BLUE;
+import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
+import static net.kyori.adventure.text.format.NamedTextColor.GOLD;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
+import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
 import static org.bukkit.Bukkit.getOnlinePlayers;
 
 @Log4j2
@@ -31,16 +36,36 @@ import static org.bukkit.Bukkit.getOnlinePlayers;
 @Builder
 public class LogDispatcher {
 
-    private Component prefixDebug;
-    private Component prefixInfo;
-    private Component prefixWarn;
-    private Component prefixError;
-    private Predicate<Player> debugFilter;
-    private Predicate<Player> infoFilter;
-    private Predicate<Player> warnFilter;
-    private Predicate<Player> errorFilter;
     private IMinecraftPlugin plugin;
     private Logger logger;
+    @Builder.Default
+    private Component prefixDebug = empty()
+            .append(text("♯", DARK_GRAY)).appendSpace()
+            .append(text("Debug", YELLOW))
+            .append(text(":", DARK_GRAY)).appendSpace();
+    @Builder.Default
+    private Component prefixInfo = empty()
+            .append(text("♯", DARK_GRAY)).appendSpace()
+            .append(text("Info", BLUE))
+            .append(text(":", DARK_GRAY)).appendSpace();
+    @Builder.Default
+    private Component prefixWarn = empty()
+            .append(text("♯", DARK_GRAY)).appendSpace()
+            .append(text("Warning", GOLD))
+            .append(text(":", DARK_GRAY)).appendSpace();
+    @Builder.Default
+    private Component prefixError = empty()
+            .append(text("♯", DARK_GRAY)).appendSpace()
+            .append(text("Error", RED))
+            .append(text(":", DARK_GRAY)).appendSpace();
+    @Builder.Default
+    private Predicate<Player> debugFilter = ServerOperator::isOp;
+    @Builder.Default
+    private Predicate<Player> infoFilter = ServerOperator::isOp;
+    @Builder.Default
+    private Predicate<Player> warnFilter = ServerOperator::isOp;
+    @Builder.Default
+    private Predicate<Player> errorFilter = ServerOperator::isOp;
 
     /**
      * Logs a debug message associated with a specific class, formats it with the provided arguments, and sends the message to online

@@ -1,9 +1,9 @@
 package de.rettichlp.therettingtonconcierge.registry.command;
 
 import com.google.inject.Injector;
-import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 

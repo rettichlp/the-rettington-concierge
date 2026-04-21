@@ -37,6 +37,7 @@ public class EnumArgument<E extends Enum<E> & ICommandArgument> implements Custo
         this.enumType = enumType;
     }
 
+    @Override
     public @NonNull E parse(@NonNull StringReader stringReader) throws CommandSyntaxException {
         String arg = stringReader.readUnquotedString();
         return stream(this.enumType.getEnumConstants())

@@ -79,15 +79,17 @@ public class RequestHandler {
     }
 
     String sendRequest(String url, HttpMethod httpMethod, @Nullable String json) {
-        return json == null ? getClient(url).method(httpMethod)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block() : getClient(url).method(httpMethod)
-                .contentType(APPLICATION_JSON)
-                .body(just(json), String.class)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        return json == null
+                ? getClient(url).method(httpMethod)
+                  .retrieve()
+                  .bodyToMono(String.class)
+                  .block()
+                : getClient(url).method(httpMethod)
+                  .contentType(APPLICATION_JSON)
+                  .body(just(json), String.class)
+                  .retrieve()
+                  .bodyToMono(String.class)
+                  .block();
     }
 
     void sendRequestAsync(String url, HttpMethod httpMethod, String json) {

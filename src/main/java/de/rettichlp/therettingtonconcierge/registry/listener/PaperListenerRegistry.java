@@ -1,11 +1,11 @@
 package de.rettichlp.therettingtonconcierge.registry.listener;
 
 import com.google.inject.Injector;
-import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import de.rettichlp.therettingtonconcierge.listener.InventoryListener;
 import de.rettichlp.therettingtonconcierge.listener.TRCEventListener;
 import de.rettichlp.therettingtonconcierge.logging.LogDispatcher;
 import de.rettichlp.therettingtonconcierge.registry.AbstractRegistry;
+import de.rettichlp.therettingtonconcierge.registry.IMinecraftPlugin;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bukkit.event.Listener;

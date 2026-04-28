@@ -50,7 +50,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.14.0")
 
     // Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
     implementation("org.springframework:spring-webflux:7.0.7")
@@ -59,7 +59,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-mongodb:5.0.5")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3")
 
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }

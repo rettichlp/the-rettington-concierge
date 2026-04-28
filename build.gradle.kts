@@ -40,8 +40,8 @@ dependencies {
     annotationProcessor("org.atteo.classindex:classindex:3.13")
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly("org.projectlombok:lombok:1.18.44")
-    annotationProcessor("org.projectlombok:lombok:1.18.44")
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
 
     // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject:guice:7.0.0")

@@ -1,8 +1,11 @@
 package de.rettichlp.therettingtonconcierge.io.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpMethod;
@@ -11,8 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.gson.reflect.TypeToken.getParameterized;
-import static de.rettichlp.therettingtonconcierge.io.GsonConfiguration.GSON;
+import static de.rettichlp.therettingtonconcierge.io.JacksonConfiguration.OBJECT_MAPPER;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -113,6 +115,22 @@ public class RequestHandler {
         return webClientBuilder.build();
     }
 
+    @SneakyThrows
+    private String toJson(Object model) {
+        return OBJECT_MAPPER.writeValueAsString(model);
+    }
+
+    @SneakyThrows
+    private <T> T fromJson(String json, Class<T> modelClass) {
+        return OBJECT_MAPPER.readValue(json, modelClass);
+    }
+
+    @SneakyThrows
+    private <T> List<T> fromJsonArray(String json, Class<T> modelClass) {
+        CollectionType collectionType = OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, modelClass);
+        return OBJECT_MAPPER.readValue(json, collectionType);
+    }
+
     /**
      * Represents an HTTP GET request that retrieves data from a specified URL and deserializes the response into objects of a
      * specified type.
@@ -133,7 +151,7 @@ public class RequestHandler {
          * @return An instance of type {@code T} representing the deserialized response data.
          */
         public T retrieve() {
-            return GSON.fromJson(sendRequest(this.url, GET, null), this.modelClass);
+            return fromJson(sendRequest(this.url, GET, null), this.modelClass);
         }
 
         /**
@@ -143,7 +161,7 @@ public class RequestHandler {
          * @return A {@code List<T>} representing the deserialized response data.
          */
         public List<T> retrieveAsList() {
-            return GSON.fromJson(sendRequest(this.url, GET, null), getParameterized(List.class, this.modelClass).getType());
+            return fromJsonArray(sendRequest(this.url, GET, null), this.modelClass);
         }
     }
 
@@ -160,15 +178,16 @@ public class RequestHandler {
         private final T model;
 
         public void send() {
-            sendRequest(this.url, POST, GSON.toJson(this.model));
+            sendRequest(this.url, POST, toJson(this.model));
         }
 
         public void sendAsync() {
-            sendRequestAsync(this.url, POST, GSON.toJson(this.model));
+            sendRequestAsync(this.url, POST, toJson(this.model));
         }
 
+        @SneakyThrows
         public T retrieve(Class<T> modelClass) {
-            return GSON.fromJson(sendRequest(this.url, POST, GSON.toJson(this.model)), modelClass);
+            return fromJson(sendRequest(this.url, POST, toJson(this.model)), modelClass);
         }
     }
 
@@ -185,11 +204,11 @@ public class RequestHandler {
         private final T model;
 
         public void send() {
-            sendRequest(this.url, PUT, GSON.toJson(this.model));
+            sendRequest(this.url, PUT, toJson(this.model));
         }
 
         public void sendAsync() {
-            sendRequestAsync(this.url, PUT, GSON.toJson(this.model));
+            sendRequestAsync(this.url, PUT, toJson(this.model));
         }
     }
 
@@ -206,11 +225,11 @@ public class RequestHandler {
         private final T model;
 
         public void send() {
-            sendRequest(this.url, DELETE, GSON.toJson(this.model));
+            sendRequest(this.url, DELETE, toJson(this.model));
         }
 
         public void sendAsync() {
-            sendRequestAsync(this.url, DELETE, GSON.toJson(this.model));
+            sendRequestAsync(this.url, DELETE, toJson(this.model));
         }
     }
 }

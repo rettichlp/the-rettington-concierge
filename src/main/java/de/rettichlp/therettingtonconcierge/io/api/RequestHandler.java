@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.Map;
 
+import static de.rettichlp.therettingtonconcierge.io.JacksonConfiguration.OBJECT_MAPPER;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -23,8 +24,6 @@ import static reactor.core.publisher.Mono.just;
 
 @Builder
 public class RequestHandler {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String baseUrl;
     private final Map<String, String> defaultHeaders;
@@ -118,18 +117,18 @@ public class RequestHandler {
 
     @SneakyThrows
     private String toJson(Object model) {
-        return this.objectMapper.writeValueAsString(model);
+        return OBJECT_MAPPER.writeValueAsString(model);
     }
 
     @SneakyThrows
     private <T> T fromJson(String json, Class<T> modelClass) {
-        return this.objectMapper.readValue(json, modelClass);
+        return OBJECT_MAPPER.readValue(json, modelClass);
     }
 
     @SneakyThrows
     private <T> List<T> fromJsonArray(String json, Class<T> modelClass) {
-        CollectionType collectionType = this.objectMapper.getTypeFactory().constructCollectionType(List.class, modelClass);
-        return this.objectMapper.readValue(json, collectionType);
+        CollectionType collectionType = OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, modelClass);
+        return OBJECT_MAPPER.readValue(json, collectionType);
     }
 
     /**

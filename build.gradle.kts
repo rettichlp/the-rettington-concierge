@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
     api("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    api("net.kyori:adventure-text-serializer-ansi:5.0.1")
+    api("net.kyori:adventure-text-serializer-ansi:5.1.1")
 
     api("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")

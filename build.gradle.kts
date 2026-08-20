@@ -53,7 +53,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
-    implementation("org.springframework:spring-webflux:7.0.7")
+    implementation("org.springframework:spring-webflux:7.0.9")
 
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb
     implementation("org.springframework.data:spring-data-mongodb:5.0.5")

@@ -1,24 +1,12 @@
-import org.gradle.api.JavaVersion.VERSION_25
-
 group = "de.rettichlp.therettingtonconcierge"
 version = project.findProperty("trcVersion") as? String ?: "0.0.0"
 println("> The Rettington Concierge Version: $version")
 
-java {
-    sourceCompatibility = VERSION_25
-    targetCompatibility = VERSION_25
-
-    withJavadocJar()
-    withSourcesJar()
-}
-
 plugins {
-    `java-library`
-    `maven-publish`
-
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23"
-    id("com.gradleup.shadow") version "9.6.1"
+    id("java-library")
+    id("maven-publish")
     id("xyz.jpenilla.run-paper") version "3.1.0"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
 repositories {
@@ -29,8 +17,7 @@ repositories {
 }
 
 dependencies {
-    api("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    api("net.kyori:adventure-text-serializer-ansi:5.2.0")
+    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
 
     api("com.velocitypowered:velocity-api:4.1.1")
     annotationProcessor("com.velocitypowered:velocity-api:4.1.1")
@@ -60,21 +47,26 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.2")
-
-    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }
 
-runPaper.disablePluginJarDetection()
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+}
 
 tasks {
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
+    runServer {
+        // Configure the Minecraft version for our task.
+        // This is the only required configuration besides applying the plugin.
+        // Your plugin's jar (or shadowJar if present) will be used automatically.
+        minecraftVersion("26.2")
+        jvmArgs("-Xms2G", "-Xmx2G")
     }
 
-    withType<Javadoc> {
-        options.encoding = "UTF-8"
-        (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
-        isFailOnError = false
+    processResources {
+        val props = mapOf("version" to version)
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
     }
 
     jar {

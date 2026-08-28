@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +71,7 @@ public class InventoryListener implements Listener {
                 }
 
                 // cancel click (if required) before handling it or aborting due to spam prevention
-                RegisteredInventory.InventorySlot clickedInventorySlot = registeredInventory.getInventorySlots().get(slotIndex);
+                RegisteredInventory.InventorySlot clickedInventorySlot = registeredInventory.getInventorySlots()[slotIndex];
                 event.setCancelled(clickedInventorySlot.cancelClick());
 
                 // spam prevention
@@ -81,7 +82,7 @@ public class InventoryListener implements Listener {
                 SPAM_PREVENTION.put(player, currentTimeMillis());
 
                 ofNullable(clickedInventorySlot.inventorySlotFunction())
-                        .ifPresent(inventoryItemFunction -> inventoryItemFunction.apply(player, registeredInventory.getInventory(), click, registeredInventory.getInventorySlots()));
+                        .ifPresent(inventoryItemFunction -> inventoryItemFunction.apply(player, registeredInventory.getInventory(), click, List.of(registeredInventory.getInventorySlots())));
 
                 Sound sound = registeredInventory.getClickSound();
                 Material type = currentItem.getType();

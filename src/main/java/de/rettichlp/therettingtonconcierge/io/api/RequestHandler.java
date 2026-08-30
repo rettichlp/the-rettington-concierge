@@ -1,6 +1,5 @@
 package de.rettichlp.therettingtonconcierge.io.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import lombok.Builder;
 import lombok.Getter;

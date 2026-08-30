@@ -4,7 +4,6 @@ import de.rettichlp.therettingtonconcierge.inventory.item.Item;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.NonNullList;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -23,12 +22,13 @@ import java.util.List;
 import static de.rettichlp.therettingtonconcierge.inventory.item.Item.TRANSPARENT_ITEM_STACK;
 import static java.lang.Math.min;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.nCopies;
 import static java.util.stream.IntStream.range;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 import static net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText;
-import static net.minecraft.core.NonNullList.withSize;
 import static org.bukkit.Bukkit.createInventory;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Sound.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_OFF;
@@ -38,7 +38,7 @@ public class RegisteredInventory {
 
     private final Component title;
     private final Inventory inventory;
-    private final NonNullList<InventorySlot> inventorySlots;
+    private final InventorySlot[] inventorySlots;
     private final Sound clickSound;
     private final boolean allowPlayerInventoryInteraction;
     private final InventoryClosedFunction<Player, Inventory, Reason> closedFunction;
@@ -131,7 +131,7 @@ public class RegisteredInventory {
         private static final ItemStack CONSTRUCTION_HELPER_ITEM_STACK = Item.builder(AIR).build();
 
         private int size = 54;
-        private NonNullList<InventorySlot> inventorySlots = withSize(54, new InventorySlot(CONSTRUCTION_HELPER_ITEM_STACK, true, null));
+        private InventorySlot[] inventorySlots = nCopies(54, new InventorySlot(CONSTRUCTION_HELPER_ITEM_STACK, true, null)).toArray(InventorySlot[]::new);
         private Component title = empty();
         private Sound openSound;
         private Sound clickSound = BLOCK_WOODEN_PRESSURE_PLATE_CLICK_OFF;
@@ -148,7 +148,7 @@ public class RegisteredInventory {
          */
         public Builder size(int size) {
             this.size = size;
-            this.inventorySlots = withSize(size, new InventorySlot(CONSTRUCTION_HELPER_ITEM_STACK, true, null));
+            this.inventorySlots = nCopies(size, new InventorySlot(CONSTRUCTION_HELPER_ITEM_STACK, true, null)).toArray(InventorySlot[]::new);
             return this;
         }
 
@@ -239,7 +239,7 @@ public class RegisteredInventory {
         public Builder add(ItemStack itemStack,
                            InventorySlotFunction<Player, Inventory, ClickType, Collection<InventorySlot>> inventorySlotFunction) {
             // first empty slot
-            int firstEmptySlotIndex = range(0, this.inventorySlots.size()).filter(value -> this.inventorySlots.get(value).itemStack().isSimilar(CONSTRUCTION_HELPER_ITEM_STACK))
+            int firstEmptySlotIndex = range(0, this.inventorySlots.length).filter(value -> this.inventorySlots[value].itemStack().isSimilar(CONSTRUCTION_HELPER_ITEM_STACK))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("No empty inventory slot found"));
 
@@ -454,7 +454,7 @@ public class RegisteredInventory {
 
             InventorySlot inventorySlot = new InventorySlot(itemStack, cancelClick, inventorySlotFunction);
 
-            this.inventorySlots.set(index, inventorySlot);
+            this.inventorySlots[index] = inventorySlot;
             return this;
         }
 
@@ -488,12 +488,12 @@ public class RegisteredInventory {
                 throw new IllegalStateException("Either size or pattern must be set");
             }
 
-            List<InventorySlot> inventorySlotsWithoutConstructionHelperItemStack = this.inventorySlots.stream().map(inventorySlot -> inventorySlot.itemStack().isSimilar(CONSTRUCTION_HELPER_ITEM_STACK)
+            List<InventorySlot> inventorySlotsWithoutConstructionHelperItemStack = stream(this.inventorySlots).map(inventorySlot -> inventorySlot.itemStack().isSimilar(CONSTRUCTION_HELPER_ITEM_STACK)
                     ? new InventorySlot(TRANSPARENT_ITEM_STACK, true, null)
                     : inventorySlot).toList();
 
             Inventory inventory = createInventory(holder, this.size, this.title);
-            for (int i = 0; i < this.inventorySlots.size(); i++) {
+            for (int i = 0; i < this.inventorySlots.length; i++) {
                 InventorySlot inventorySlot = inventorySlotsWithoutConstructionHelperItemStack.get(i);
                 inventory.setItem(i, inventorySlot.itemStack());
             }

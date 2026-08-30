@@ -7,24 +7,27 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
-import static com.mojang.brigadier.suggestion.Suggestions.empty;
+import static io.papermc.paper.command.brigadier.MessageComponentSerializer.message;
+import static java.lang.String.valueOf;
 import static java.util.Arrays.stream;
-import static net.minecraft.commands.SharedSuggestionProvider.suggest;
+import static java.util.Locale.ROOT;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 
 public class EnumArgument<E extends Enum<E> & ICommandArgument> implements CustomArgumentType<E, String> {
 
     private static final DynamicCommandExceptionType ERROR_ENUM_NOT_FOUND = new DynamicCommandExceptionType(
-            value -> Component.translatableEscape("argument.enum.invalid", value)
+            value -> message().serialize(translatable("argument.enum.invalid", text(valueOf(value))))
     );
+
     private final Class<E> enumType;
 
     /**
@@ -54,9 +57,16 @@ public class EnumArgument<E extends Enum<E> & ICommandArgument> implements Custo
     @Override
     public @NonNull <S> CompletableFuture<Suggestions> listSuggestions(@NonNull CommandContext<S> context,
                                                                        @NonNull SuggestionsBuilder builder) {
-        return context.getSource() instanceof SharedSuggestionProvider
-                ? suggest(stream(this.enumType.getEnumConstants()).map(ICommandArgument::getTabString).toList(), builder)
-                : empty();
+        if (!(context.getSource() instanceof CommandSourceStack)) {
+            return builder.buildFuture();
+        }
+
+        stream(this.enumType.getEnumConstants())
+                .map(ICommandArgument::getTabString)
+                .filter(tabString -> tabString.toLowerCase(ROOT).startsWith(builder.getRemainingLowerCase()))
+                .forEach(builder::suggest);
+
+        return builder.buildFuture();
     }
 
     /**

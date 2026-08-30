@@ -1,5 +1,3 @@
-group = "de.rettichlp.therettingtonconcierge"
-version = project.findProperty("trcVersion") as? String ?: "0.0.0"
 println("> The Rettington Concierge Version: $version")
 
 plugins {

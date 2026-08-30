@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.stream;
 
@@ -30,8 +31,8 @@ public final class VelocityListenerRegistry extends AbstractRegistry<Object> {
     }
 
     @Override
-    public @NonNull @Unmodifiable List<Class<Object>> classes() {
-        return getAllClasses().stream()
+    public @NonNull @Unmodifiable List<Class<Object>> classes(Pattern packageFilter) {
+        return getAllClasses(packageFilter).stream()
                 .filter(objectClass -> stream(objectClass.getMethods())
                         .anyMatch(method -> method.isAnnotationPresent(Subscribe.class)))
                 .toList();

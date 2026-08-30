@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static java.util.Optional.ofNullable;
 
@@ -21,8 +22,8 @@ public abstract class AbstractCommandRegistry<T> extends AbstractRegistry<IComma
     public abstract void registerTypeSpecific(@NonNull ICommand<T> instance, @NonNull Command command);
 
     @Override
-    public @NonNull @Unmodifiable List<Class<ICommand<T>>> classes() {
-        return getAllClasses().stream()
+    public @NonNull @Unmodifiable List<Class<ICommand<T>>> classes(Pattern packageFilter) {
+        return getAllClasses(packageFilter).stream()
                 .filter(clazz -> clazz.isAnnotationPresent(Command.class))
                 .toList();
     }

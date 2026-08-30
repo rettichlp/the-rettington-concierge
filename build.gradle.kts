@@ -1,24 +1,10 @@
-import org.gradle.api.JavaVersion.VERSION_25
-
-group = "de.rettichlp.therettingtonconcierge"
-version = project.findProperty("trcVersion") as? String ?: "0.0.0"
 println("> The Rettington Concierge Version: $version")
 
-java {
-    sourceCompatibility = VERSION_25
-    targetCompatibility = VERSION_25
-
-    withJavadocJar()
-    withSourcesJar()
-}
-
 plugins {
-    `java-library`
-    `maven-publish`
-
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
-    id("com.gradleup.shadow") version "9.4.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("java-library")
+    id("maven-publish")
+    id("xyz.jpenilla.run-paper") version "3.1.0"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
 repositories {
@@ -29,11 +15,10 @@ repositories {
 }
 
 dependencies {
-    api("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    api("net.kyori:adventure-text-serializer-ansi:5.0.1")
+    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
 
-    api("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
+    api("com.velocitypowered:velocity-api:4.1.1")
+    annotationProcessor("com.velocitypowered:velocity-api:4.1.1")
 
     // https://mvnrepository.com/artifact/org.atteo.classindex/classindex
     api("org.atteo.classindex:classindex:3.13")
@@ -50,31 +35,36 @@ dependencies {
     implementation("com.google.code.gson:gson:2.14.0")
 
     // Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.2")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
-    implementation("org.springframework:spring-webflux:7.0.7")
+    implementation("org.springframework:spring-webflux:7.0.9")
 
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb
-    implementation("org.springframework.data:spring-data-mongodb:5.0.5")
+    implementation("org.springframework.data:spring-data-mongodb:5.1.1")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2")
-
-    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.2")
 }
 
-runPaper.disablePluginJarDetection()
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+}
 
 tasks {
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
+    runServer {
+        // Configure the Minecraft version for our task.
+        // This is the only required configuration besides applying the plugin.
+        // Your plugin's jar (or shadowJar if present) will be used automatically.
+        minecraftVersion("26.2")
+        jvmArgs("-Xms2G", "-Xmx2G")
     }
 
-    withType<Javadoc> {
-        options.encoding = "UTF-8"
-        (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
-        isFailOnError = false
+    processResources {
+        val props = mapOf("version" to version)
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
     }
 
     jar {

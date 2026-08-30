@@ -1,6 +1,7 @@
 package de.rettichlp.therettingtonconcierge.utils.command;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -15,8 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static net.minecraft.network.chat.Component.literal;
-import static net.minecraft.network.chat.Component.translatable;
+import static io.papermc.paper.command.brigadier.MessageComponentSerializer.message;
+import static net.kyori.adventure.text.Component.translatable;
 
 public class CommandUtils {
 
@@ -26,7 +27,7 @@ public class CommandUtils {
             return player;
         }
 
-        throw new CommandSyntaxException(new SimpleCommandExceptionType(literal("test1")), literal("test2"));
+        throw new CommandSyntaxException(new SimpleCommandExceptionType(new LiteralMessage("test1")), new LiteralMessage("test2"));
     }
 
     public static OfflinePlayer getMentionedOfflinePlayer(@NonNull CommandContext<CommandSourceStack> commandContext) throws
@@ -37,7 +38,7 @@ public class CommandUtils {
     public static OfflinePlayer getMentionedOfflinePlayer(@NonNull CommandContext<CommandSourceStack> commandContext,
                                                           String argumentName) throws CommandSyntaxException {
         if (getMentionedOfflinePlayers(commandContext, argumentName).size() > 1) {
-            throw new SimpleCommandExceptionType(translatable("argument.player.toomany")).create();
+            throw new SimpleCommandExceptionType(message().serialize(translatable("argument.player.toomany"))).create();
         }
 
         return getMentionedOfflinePlayers(commandContext, argumentName).getFirst();
@@ -61,7 +62,7 @@ public class CommandUtils {
                 .toList();
 
         if (offlinePlayers.isEmpty()) {
-            throw new SimpleCommandExceptionType(translatable("argument.player.unknown")).create();
+            throw new SimpleCommandExceptionType(message().serialize(translatable("argument.player.unknown"))).create();
         }
 
         return offlinePlayers;

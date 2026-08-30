@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
@@ -33,8 +34,8 @@ public final class PaperListenerRegistry extends AbstractRegistry<Listener> {
     }
 
     @Override
-    public @NonNull @Unmodifiable List<Class<Listener>> classes() {
-        return getAllClasses().stream()
+    public @NonNull @Unmodifiable List<Class<Listener>> classes(Pattern packageFilter) {
+        return getAllClasses(packageFilter).stream()
                 .filter(Listener.class::isAssignableFrom)
                 .toList();
     }

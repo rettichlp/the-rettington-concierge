@@ -6,13 +6,13 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.inventory.components.CraftCustomModelDataComponent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
@@ -20,9 +20,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static java.util.UUID.randomUUID;
@@ -171,15 +169,17 @@ public class Item {
          * @throws IllegalStateException if the provided custom model data is of an unsupported type.
          */
         public Builder customModelData(@NonNull Object customModelData) {
-            Map<String, Object> customModelDataMap = new HashMap<>();
+            this.itemStack.editMeta(itemMeta -> {
+                CustomModelDataComponent component = itemMeta.getCustomModelDataComponent();
 
-            switch (customModelData) {
-                case Number number -> customModelDataMap.put("floats", List.of(number));
-                case String string -> customModelDataMap.put("strings", List.of(string));
-                default -> throw new IllegalStateException("Unexpected value: " + customModelData.getClass());
-            }
+                switch (customModelData) {
+                    case Number number -> component.setFloats(List.of(number.floatValue()));
+                    case String string -> component.setStrings(List.of(string));
+                    default -> throw new IllegalStateException("Unexpected value: " + customModelData.getClass());
+                }
 
-            this.itemStack.editMeta(itemMeta -> itemMeta.setCustomModelDataComponent(new CraftCustomModelDataComponent(customModelDataMap)));
+                itemMeta.setCustomModelDataComponent(component);
+            });
             return this;
         }
 

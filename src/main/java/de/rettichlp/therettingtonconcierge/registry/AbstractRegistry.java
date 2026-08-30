@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.reflect.ClassPath.from;
@@ -42,15 +43,15 @@ public abstract class AbstractRegistry<T> {
         this.registryName = registryName;
     }
 
-    public abstract @NonNull @Unmodifiable List<Class<T>> classes();
+    public abstract @NonNull @Unmodifiable List<Class<T>> classes(Pattern packageFilter);
 
     public abstract void register(@NonNull Class<T> clazz, T instance);
 
-    public void registerAll() {
+    public void registerAll(Pattern packageFilter) {
         int skipped = 0;
         int registered = 0;
 
-        Iterable<Class<T>> classes = classes();
+        Iterable<Class<T>> classes = classes(packageFilter);
         for (Class<T> clazz : classes) {
             if (clazz.isAnnotationPresent(Ignore.class)) {
                 skipped++;
@@ -71,10 +72,10 @@ public abstract class AbstractRegistry<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected Set<Class<T>> getAllClasses() {
+    protected Set<Class<T>> getAllClasses(Pattern packageFilter) {
         try {
             return from(this.plugin.classloader()).getAllClasses().stream()
-                    .filter(classInfo -> classInfo.getPackageName().startsWith("de.gronkhmc"))
+                    .filter(classInfo -> classInfo.getPackageName().matches(packageFilter.pattern()))
                     .map(ClassPath.ClassInfo::load)
                     .filter(this.clazz::isAssignableFrom)
                     .map(clazz -> (Class<T>) clazz)

@@ -17,8 +17,8 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
 
-    api("com.velocitypowered:velocity-api:4.1.1")
-    annotationProcessor("com.velocitypowered:velocity-api:4.1.1")
+    api("com.velocitypowered:velocity-api:4.2.0")
+    annotationProcessor("com.velocitypowered:velocity-api:4.2.0")
 
     // https://mvnrepository.com/artifact/org.atteo.classindex/classindex
     api("org.atteo.classindex:classindex:3.13")

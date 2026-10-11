@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.+")
 
     api("com.velocitypowered:velocity-api:4.1.1")
     annotationProcessor("com.velocitypowered:velocity-api:4.1.1")

@@ -9,6 +9,7 @@ import de.rettichlp.therettingtonconcierge.io.api.serialization.ExclusionDeseria
 import de.rettichlp.therettingtonconcierge.io.api.serialization.ExclusionSerializationStrategy;
 import de.rettichlp.therettingtonconcierge.io.configuration.ConfigurationSerializableTypeHierarchyAdapter;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
+import static java.lang.Class.forName;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 public class GsonConfiguration {
@@ -24,11 +26,22 @@ public class GsonConfiguration {
     /**
      * Represents the Gson instance used for JSON serialization and deserialization.
      */
-    public static final Gson GSON = new GsonBuilder()
+    public static final Gson GSON = createGson();
+
+    private static @NonNull Gson createGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        // Bukkit is not available on every platform (e.g. Velocity)
+        try {
+            forName("org.bukkit.configuration.serialization.ConfigurationSerializable", false, GsonConfiguration.class.getClassLoader());
+            gsonBuilder.registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableTypeHierarchyAdapter());
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
+        }
+
+        return gsonBuilder
             .setPrettyPrinting()
             .addSerializationExclusionStrategy(new ExclusionSerializationStrategy())
             .addDeserializationExclusionStrategy(new ExclusionDeserializationStrategy())
-            .registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableTypeHierarchyAdapter())
             .registerTypeAdapter(Instant.class, (JsonDeserializer<Instant>) (json, _, _) -> Instant.parse(json.getAsJsonPrimitive().getAsString()))
             .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>) (instant, _, _) -> new JsonPrimitive(instant.toString()))
             .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, _, _) -> LocalDate.parse(json.getAsJsonPrimitive().getAsString()))
@@ -42,4 +55,5 @@ public class GsonConfiguration {
             .registerTypeAdapter(Duration.class, (JsonDeserializer<Duration>) (json, _, _) -> Duration.parse(json.getAsJsonPrimitive().getAsString()))
             .registerTypeAdapter(Duration.class, (JsonSerializer<Duration>) (duration, _, _) -> new JsonPrimitive(duration.toString()))
             .create();
+    }
 }

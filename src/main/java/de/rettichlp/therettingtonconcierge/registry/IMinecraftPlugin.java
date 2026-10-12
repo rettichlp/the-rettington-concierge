@@ -28,7 +28,13 @@ public interface IMinecraftPlugin {
     }
 
     default boolean isPaperPlugin() {
-        return this instanceof JavaPlugin;
+        for (Class<?> clazz = this.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
+            if ("org.bukkit.plugin.java.JavaPlugin".equals(clazz.getName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     default JavaPlugin getPaperPlugin() {

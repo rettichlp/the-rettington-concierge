@@ -24,11 +24,14 @@ public interface IMinecraftPlugin {
     @NonNull ClassLoader classloader();
 
     default boolean isVelocityPlugin() {
-        return this.getClass().isAnnotationPresent(Plugin.class);
+        return stream(this.getClass().getAnnotations())
+                .anyMatch(annotation -> "com.velocitypowered.api.plugin.Plugin".equals(annotation.annotationType().getName()));
     }
 
     default boolean isPaperPlugin() {
-        return this instanceof JavaPlugin;
+        return ofNullable(this.getClass().getSuperclass())
+                .map(clazz -> "org.bukkit.plugin.java.JavaPlugin".equals(clazz.getName()))
+                .orElse(false);
     }
 
     default JavaPlugin getPaperPlugin() {

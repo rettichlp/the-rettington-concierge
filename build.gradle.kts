@@ -15,18 +15,18 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.+")
 
-    api("com.velocitypowered:velocity-api:4.1.1")
-    annotationProcessor("com.velocitypowered:velocity-api:4.1.1")
+    compileOnly("com.velocitypowered:velocity-api:4.2.0")
+    annotationProcessor("com.velocitypowered:velocity-api:4.2.0")
 
     // https://mvnrepository.com/artifact/org.atteo.classindex/classindex
     api("org.atteo.classindex:classindex:3.13")
     annotationProcessor("org.atteo.classindex:classindex:3.13")
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly("org.projectlombok:lombok:1.18.46")
-    annotationProcessor("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
 
     // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject:guice:7.0.0")
@@ -35,7 +35,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.14.0")
 
     // Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.3")
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webflux
     implementation("org.springframework:spring-webflux:7.0.9")
@@ -44,7 +44,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-mongodb:5.1.1")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.3")
 }
 
 java {

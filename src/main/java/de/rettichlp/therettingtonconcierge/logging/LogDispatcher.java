@@ -7,8 +7,9 @@ import lombok.extern.log4j.Log4j2;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -36,8 +37,8 @@ public class LogDispatcher<T> {
 
     private IMinecraftPlugin plugin;
     private Logger logger;
-    private Function<Void, List<T>> playersProvider;
-    private Consumer<Component> messageSender;
+    private Function<Void, Collection<? extends T>> playersProvider;
+    private BiConsumer<T, Component> messageSender;
     @Builder.Default
     private Component prefixDebug = empty()
             .append(text("♯", DARK_GRAY)).appendSpace()
@@ -79,7 +80,7 @@ public class LogDispatcher<T> {
     public void debug(@NonNull Class<?> clazz, String rawMessage, Object... args) {
         String formattedMessage = "[" + clazz.getSimpleName() + "] " + log.getMessageFactory().newMessage(rawMessage, args).getFormattedMessage();
         this.logger.log(FINE, "[DEBUG] " + formattedMessage);
-        getPlayersForLevel(FINE).forEach(player -> this.messageSender.accept(this.prefixDebug.append(text(formattedMessage, GRAY))));
+        getPlayersForLevel(FINE).forEach(player -> this.messageSender.accept(player, this.prefixDebug.append(text(formattedMessage, GRAY))));
     }
 
     /**
@@ -92,7 +93,7 @@ public class LogDispatcher<T> {
     public void info(String rawMessage, Object... args) {
         String formattedMessage = log.getMessageFactory().newMessage(rawMessage, args).getFormattedMessage();
         this.logger.log(INFO, formattedMessage);
-        getPlayersForLevel(INFO).forEach(player -> this.messageSender.accept(this.prefixInfo.append(text(formattedMessage, GRAY))));
+        getPlayersForLevel(INFO).forEach(player -> this.messageSender.accept(player, this.prefixInfo.append(text(formattedMessage, GRAY))));
     }
 
     /**
@@ -105,7 +106,7 @@ public class LogDispatcher<T> {
     public void warn(String rawMessage, Object... args) {
         String formattedMessage = log.getMessageFactory().newMessage(rawMessage, args).getFormattedMessage();
         this.logger.log(WARNING, formattedMessage);
-        getPlayersForLevel(WARNING).forEach(player -> this.messageSender.accept(this.prefixWarn.append(text(formattedMessage, GRAY))));
+        getPlayersForLevel(WARNING).forEach(player -> this.messageSender.accept(player, this.prefixWarn.append(text(formattedMessage, GRAY))));
     }
 
     /**
@@ -143,12 +144,12 @@ public class LogDispatcher<T> {
      */
     public void error(Throwable throwable, String message) {
         this.logger.log(SEVERE, message, throwable);
-        getPlayersForLevel(SEVERE).forEach(player -> this.messageSender.accept(this.prefixError.append(text(message, GRAY))
+        getPlayersForLevel(SEVERE).forEach(player -> this.messageSender.accept(player, this.prefixError.append(text(message, GRAY))
                 .hoverEvent(getStackTraceComponent(throwable))));
     }
 
-    private List<T> getPlayersForLevel(@NonNull Level level) {
-        List<T> players = this.playersProvider.apply(null);
+    private List<? extends T> getPlayersForLevel(@NonNull Level level) {
+        Collection<? extends T> players = this.playersProvider.apply(null);
 
         Predicate<T> filter = switch (level.getName()) {
             case "DEBUG" -> this.debugFilter;

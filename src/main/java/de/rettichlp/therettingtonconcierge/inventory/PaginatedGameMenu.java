@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import static de.rettichlp.therettingtonconcierge.translation.I18nMiniMessageTranslator.localize;
 import static de.rettichlp.therettingtonconcierge.translation.I18nMiniMessageTranslator.localizeMultiline;
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Arrays.stream;
 import static net.kyori.adventure.text.Component.empty;
@@ -100,30 +101,35 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
         addSortItemStack(registeredInventoryBuilder);
     }
 
-    @Override
-    public void open() {
-        open(1);
-    }
-
     /**
-     * Opens the inventory menu at the specified page index for the player. The method builds and initializes the inventory structure,
-     * applying modifications if the current instance implements {@link IOverwrite}. Finally, the constructed inventory is displayed to
-     * the player.
+     * Opens the inventory menu at the specified page index for the player.
      *
      * @param page the index of the page to be displayed in the menu; must be a non-negative integer
      */
     public void open(int page) {
-        RegisteredInventory.Builder registeredInventoryBuilder = RegisteredInventory.getBuilder()
-                .title(title())
-                .size(size());
+        openAt(page);
+    }
 
-        builder(registeredInventoryBuilder, page, 0);
+    /**
+     * Rebuilds the content of the open menu at the page it shows now, without opening a new inventory.
+     *
+     * @return {@code true} if the content of the open menu was updated, {@code false} if the menu is not open
+     */
+    @Override
+    public boolean refresh() {
+        return refresh(max(1, this.currentPage));
+    }
 
-        if (this instanceof IOverwrite iOverwrite) {
-            iOverwrite.overwrite(registeredInventoryBuilder);
-        }
-
-        registeredInventoryBuilder.openInventory(this.player);
+    /**
+     * Rebuilds the content of the open menu at the given page, without opening a new inventory. It does nothing if the player closed
+     * the menu or opened another one.
+     *
+     * @param page the index of the page to be displayed in the menu
+     *
+     * @return {@code true} if the content of the open menu was updated, {@code false} if the menu is not open
+     */
+    public boolean refresh(int page) {
+        return refreshAt(page);
     }
 
     /**
@@ -200,14 +206,14 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             registeredInventoryBuilder
                     .item(-6, Item.builder(PAPER)
                             .displayName(text("«", DARK_GRAY))
-                            .build(), (_, _, _, _) -> open(this.currentPage - 1));
+                            .build(), (_, _, _, _) -> refresh(this.currentPage - 1));
         }
 
         if (getPageCount() > this.currentPage) {
             registeredInventoryBuilder
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
-                            .build(), (_, _, _, _) -> open(this.currentPage + 1));
+                            .build(), (_, _, _, _) -> refresh(this.currentPage + 1));
         }
     }
 
@@ -246,12 +252,12 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .item(-7, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
                             this.filter = "";
-                            open(this.currentPage); // reopen at the same page
+                            refresh(this.currentPage); // update at the same page
                             return;
                         }
 
                         this.filter = nextMapKey(iFilterable.filters(), this.filter);
-                        open(); // reopen at page 1
+                        refresh(1); // update at page 1
                     });
         }
     }
@@ -276,14 +282,14 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .item(-5, searchItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
                             this.search = "";
-                            open(this.currentPage); // reopen at the same page
+                            refresh(this.currentPage); // update at the same page
                             return;
                         }
 
                         Component title = render(translatable("gui.language.search"), this.player.locale());
                         new TextInputDialog(this.player, title, empty(), s -> {
                             this.search = s;
-                            open(); // reopen at page 1
+                            open(1); // the input dialog replaced the inventory, so open it again
                         }).open();
                     });
         }
@@ -310,12 +316,12 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .item(-3, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
                             this.sort = "";
-                            open(this.currentPage); // reopen at the same page
+                            refresh(this.currentPage); // update at the same page
                             return;
                         }
 
                         this.sort = nextMapKey(iSortable.comparators(), this.sort);
-                        open(this.currentPage); // reopen at the same page because the sorting does not change the number of elements
+                        refresh(this.currentPage); // update at the same page because the sorting does not change the number of elements
                     });
         }
     }

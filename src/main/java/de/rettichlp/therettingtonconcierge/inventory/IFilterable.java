@@ -6,4 +6,8 @@ import java.util.function.Predicate;
 public interface IFilterable<E> {
 
     Map<String, Predicate<E>> filters();
+
+    default String defaultFilter() {
+        return "";
+    }
 }

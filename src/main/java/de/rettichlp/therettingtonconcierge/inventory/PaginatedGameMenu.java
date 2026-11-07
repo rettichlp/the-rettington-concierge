@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,9 +41,10 @@ import static org.bukkit.event.inventory.ClickType.SHIFT_LEFT;
 public abstract class PaginatedGameMenu<E> extends GameMenu {
 
     private int currentPage = 0;
-    private String filter = "";
     private String search = "";
     private String sort = "";
+    @Nullable
+    private String filter;
 
     public PaginatedGameMenu(Player player) {
         super(player);
@@ -102,15 +104,6 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
     }
 
     /**
-     * Opens the inventory menu at the specified page index for the player.
-     *
-     * @param page the index of the page to be displayed in the menu; must be a non-negative integer
-     */
-    public void open(int page) {
-        openAt(page);
-    }
-
-    /**
      * Rebuilds the content of the open menu at the page it shows now, without opening a new inventory.
      *
      * @return {@code true} if the content of the open menu was updated, {@code false} if the menu is not open
@@ -118,6 +111,15 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
     @Override
     public boolean refresh() {
         return refresh(max(1, this.currentPage));
+    }
+
+    /**
+     * Opens the inventory menu at the specified page index for the player.
+     *
+     * @param page the index of the page to be displayed in the menu; must be a non-negative integer
+     */
+    public void open(int page) {
+        openAt(page);
     }
 
     /**
@@ -145,6 +147,20 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
     }
 
     /**
+     * The key of the filter that is active now. It starts with {@link IFilterable#defaultFilter()}, or is empty if the menu has no
+     * filters.
+     *
+     * @return the key of the active filter, empty if no filter is active
+     */
+    public String getFilter() {
+        if (this.filter == null) {
+            this.filter = this instanceof IFilterable<?> iFilterable ? iFilterable.defaultFilter() : "";
+        }
+
+        return this.filter;
+    }
+
+    /**
      * Filters, searches, and optionally sorts the elements from the menu based on the current filter, search, and sort criteria. If
      * the menu supports filtering and a valid predicate is associated with the filter key, the elements are filtered accordingly. If
      * the menu supports searching and a search term is provided, elements matching the search criteria are included. If the menu
@@ -156,8 +172,8 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
     private @NonNull @Unmodifiable List<E> getFilteredElements() {
         Stream<E> elementStream = stream(elements());
 
-        if (this instanceof IFilterable<?> iFilterable && !this.filter.isEmpty()) {
-            Predicate<E> predicate = (Predicate<E>) iFilterable.filters().get(this.filter);
+        if (this instanceof IFilterable<?> iFilterable && !getFilter().isEmpty()) {
+            Predicate<E> predicate = (Predicate<E>) iFilterable.filters().get(getFilter());
 
             if (predicate != null) {
                 elementStream = elementStream.filter(predicate);
@@ -244,19 +260,19 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             Locale locale = this.player.locale();
             ItemStack sortItemStack = Item.builder(HOPPER)
                     .displayName(localize("gui.filter.name", locale))
-                    .lore(localizeMultiline("gui.filter.tooltip", locale, this.filter.isEmpty() ? "-" : localize("gui.filter.type." + this.filter, locale)))
-                    .glint(!this.filter.isEmpty())
+                    .lore(localizeMultiline("gui.filter.tooltip", locale, getFilter().isEmpty() ? "-" : localize("gui.filter.type." + getFilter(), locale)))
+                    .glint(!getFilter().equals(iFilterable.defaultFilter())) // highlighted if it differs from what the menu opened with
                     .build();
 
             registeredInventoryBuilder
                     .item(-7, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
-                            this.filter = "";
-                            refresh(this.currentPage); // update at the same page
+                            this.filter = iFilterable.defaultFilter();
+                            refresh(1); // the number of elements may change, so update at page 1
                             return;
                         }
 
-                        this.filter = nextMapKey(iFilterable.filters(), this.filter);
+                        this.filter = nextMapKey(iFilterable.filters(), getFilter());
                         refresh(1); // update at page 1
                     });
         }

@@ -79,7 +79,7 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
     private void addPageControl(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this.currentPage > 1) {
             registeredInventoryBuilder
-                    .item(-6, Item.builder(PAPER)
+                    .item(-7, Item.builder(PAPER)
                             .displayName(text("«", DARK_GRAY))
                             .customModelData("gui.page.previous")
                             .build(), (clicker, _, _, _) -> open(this.currentPage - 1, this.currentTabIndex));
@@ -88,7 +88,7 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
         int pageSize = size() - 18; // the first row is reserved for tab control; the last row is reserved for page control
         if (elements(this.currentTabIndex).length > this.currentPage * pageSize) {
             registeredInventoryBuilder
-                    .item(-4, Item.builder(PAPER)
+                    .item(-3, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
                             .customModelData("gui.page.next")
                             .build(), (clicker, _, _, _) -> open(this.currentPage + 1, this.currentTabIndex));

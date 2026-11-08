@@ -222,6 +222,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             registeredInventoryBuilder
                     .item(-6, Item.builder(PAPER)
                             .displayName(text("«", DARK_GRAY))
+                            .customModelData("gui.page.previous")
                             .build(), (_, _, _, _) -> refresh(this.currentPage - 1));
         }
 
@@ -229,6 +230,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
             registeredInventoryBuilder
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
+                            .customModelData("gui.page.next")
                             .build(), (_, _, _, _) -> refresh(this.currentPage + 1));
         }
     }

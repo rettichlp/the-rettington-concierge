@@ -81,6 +81,7 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
             registeredInventoryBuilder
                     .item(-6, Item.builder(PAPER)
                             .displayName(text("«", DARK_GRAY))
+                            .customModelData("gui.page.previous")
                             .build(), (clicker, _, _, _) -> open(this.currentPage - 1, this.currentTabIndex));
         }
 
@@ -89,6 +90,7 @@ public abstract class PaginatedTabGameMenu<E> extends TabGameMenu<E> {
             registeredInventoryBuilder
                     .item(-4, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
+                            .customModelData("gui.page.next")
                             .build(), (clicker, _, _, _) -> open(this.currentPage + 1, this.currentTabIndex));
         }
     }

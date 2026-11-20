@@ -41,7 +41,7 @@ dependencies {
     implementation("org.springframework:spring-webflux:7.1.0")
 
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb
-    implementation("org.springframework.data:spring-data-mongodb:5.1.2")
+    implementation("org.springframework.data:spring-data-mongodb:5.2.0")
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.23.0")

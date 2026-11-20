@@ -505,15 +505,43 @@ public class RegisteredInventory {
         }
 
         /**
+         * Replaces the content of an inventory that is already open with the content of this builder, without opening a new inventory.
+         * The title and the size of the inventory cannot change, so the size of this builder must be the size of the inventory.
+         *
+         * @param registeredInventory the registered inventory to update
+         *
+         * @throws IllegalStateException if the size of this builder is not the size of the inventory
+         */
+        public void updateInventory(@NonNull RegisteredInventory registeredInventory) {
+            Inventory inventory = registeredInventory.getInventory();
+            if (this.size != inventory.getSize()) {
+                throw new IllegalStateException("The size of the inventory cannot change, it is " + inventory.getSize() + " but the update has " + this.size);
+            }
+
+            InventorySlot[] targetInventorySlots = registeredInventory.getInventorySlots();
+            for (int i = 0; i < this.inventorySlots.length; i++) {
+                InventorySlot inventorySlot = this.inventorySlots[i].itemStack().isSimilar(CONSTRUCTION_HELPER_ITEM_STACK)
+                        ? new InventorySlot(TRANSPARENT_ITEM_STACK, true, null)
+                        : this.inventorySlots[i];
+
+                targetInventorySlots[i] = inventorySlot; // clicks read the slots from this array, so they follow the new content
+                inventory.setItem(i, inventorySlot.itemStack());
+            }
+        }
+
+        /**
          * Opens an inventory for the specified player and plays a sound effect.
          *
          * @param player the player for whom the inventory will be opened
+         *
+         * @return the registered inventory that was opened, e.g. to update it later with {@link #updateInventory(RegisteredInventory)}
          */
-        public void openInventory(Player player) {
+        public RegisteredInventory openInventory(Player player) {
             RegisteredInventory registeredInventory = build(player);
             registeredInventory.setOpen(true);
             player.openInventory(registeredInventory.getInventory());
             player.playSound(player.getLocation(), this.openSound, 1, 1);
+            return registeredInventory;
         }
     }
 

@@ -220,7 +220,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
     private void addPageControl(RegisteredInventory.Builder registeredInventoryBuilder) {
         if (this.currentPage > 1) {
             registeredInventoryBuilder
-                    .item(-6, Item.builder(PAPER)
+                    .item(-7, Item.builder(PAPER)
                             .displayName(text("«", DARK_GRAY))
                             .customModelData("gui.page.previous")
                             .build(), (_, _, _, _) -> refresh(this.currentPage - 1));
@@ -228,7 +228,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
 
         if (getPageCount() > this.currentPage) {
             registeredInventoryBuilder
-                    .item(-4, Item.builder(PAPER)
+                    .item(-3, Item.builder(PAPER)
                             .displayName(text("»", DARK_GRAY))
                             .customModelData("gui.page.next")
                             .build(), (_, _, _, _) -> refresh(this.currentPage + 1));
@@ -267,7 +267,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .build();
 
             registeredInventoryBuilder
-                    .item(-7, sortItemStack, (_, _, clickType, _) -> {
+                    .item(-6, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
                             this.filter = iFilterable.defaultFilter();
                             refresh(1); // the number of elements may change, so update at page 1
@@ -331,7 +331,7 @@ public abstract class PaginatedGameMenu<E> extends GameMenu {
                     .build();
 
             registeredInventoryBuilder
-                    .item(-3, sortItemStack, (_, _, clickType, _) -> {
+                    .item(-4, sortItemStack, (_, _, clickType, _) -> {
                         if (clickType == SHIFT_LEFT) {
                             this.sort = "";
                             refresh(this.currentPage); // update at the same page
